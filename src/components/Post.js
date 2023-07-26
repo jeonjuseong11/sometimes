@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { BsChat, BsSend } from "react-icons/bs";
 import { FiMoreHorizontal } from "react-icons/fi";
 import Comment from "./Comment";
@@ -6,8 +6,9 @@ import { MdOutlineExpandLess, MdOutlineExpandMore } from "react-icons/md";
 import "../styles.css";
 import DropdownMenu from "./DropdownMenu";
 import { PostFormTextArea } from "./PostForm";
+import axios from "axios";
 
-const Post = ({ id, content }) => {
+const Post = ({ id, title, content, category, fetchData }) => {
   const [comments, setComments] = useState([
     { id: "admin1", content: "첫 번째 댓글" },
     { id: "admin2", content: "둘 번째 댓글" },
@@ -24,10 +25,7 @@ const Post = ({ id, content }) => {
 
   const handleAddComment = () => {
     if (newComment.trim() !== "") {
-      setComments((prevComments) => [
-        { id: 1, content: newComment },
-        ...prevComments,
-      ]);
+      setComments((prevComments) => [{ id: 1, content: newComment }, ...prevComments]);
       setNewComment("");
       inputRef.current.blur();
     } else {
@@ -64,7 +62,7 @@ const Post = ({ id, content }) => {
     setInputFocused(false);
   };
 
-  const inputRef = React.useRef(null);
+  const inputRef = useRef(null);
 
   const handleEdit = () => {
     if (!editing) {
@@ -79,9 +77,62 @@ const Post = ({ id, content }) => {
     setEditing(false);
   };
 
-  const handleDelete = () => {
+  const userInfo = JSON.parse(localStorage.getItem("userInfo"));
+
+  const handleEditPost = async () => {
+    if (editedContent.trim() === "") {
+      alert("내용을 입력해주세요.");
+      return;
+    }
+
+    try {
+      const response = await axios.put(
+        `http://localhost:8080/board?id=${id}&content=${editedContent}`,
+        {
+          title: title,
+          content: editedContent,
+          category: category,
+        },
+        {
+          headers: {
+            ACCESS_TOKEN: userInfo.access_TOKEN,
+          },
+        }
+      );
+
+      if (response.status === 200) {
+        alert("게시글이 성공적으로 수정되었습니다.");
+        fetchData();
+        setEditing(false);
+      } else {
+        alert("게시글 수정에 실패하였습니다.");
+      }
+    } catch (error) {
+      console.error("Error occurred while editing the post:", error);
+      alert("게시글 수정에 실패하였습니다.");
+    }
+  };
+
+  const handleDelete = async () => {
     const shouldDelete = window.confirm("정말로 이 게시글을 삭제하시겠습니까?");
     if (shouldDelete) {
+      try {
+        const response = await axios.delete(`http://localhost:8080/board?id=${id}`, {
+          headers: {
+            ACCESS_TOKEN: userInfo.access_TOKEN,
+          },
+        });
+
+        if (response.status === 200) {
+          alert("게시글이 성공적으로 삭제되었습니다.");
+          fetchData();
+        } else {
+          alert("게시글 삭제에 실패하였습니다.");
+        }
+      } catch (error) {
+        console.error("Error occurred while deleting the post:", error);
+        alert("게시글 삭제에 실패하였습니다.");
+      }
     }
   };
 
@@ -107,7 +158,7 @@ const Post = ({ id, content }) => {
               value={editedContent}
               onChange={(e) => setEditedContent(e.target.value)}
             />
-            <button onClick={handleEdit}>저장</button>
+            <button onClick={handleEditPost}>저장</button>
             <button onClick={handleCancelEdit}>취소</button>
           </>
         ) : (
@@ -130,9 +181,7 @@ const Post = ({ id, content }) => {
               <button onClick={() => setShowMenu((prev) => !prev)}>
                 <FiMoreHorizontal />
               </button>
-              {showMenu && (
-                <DropdownMenu onEdit={handleEdit} onDelete={handleDelete} />
-              )}
+              {showMenu && <DropdownMenu onEdit={handleEdit} onDelete={handleDelete} />}
             </div>
           </div>
         )}
@@ -193,16 +242,14 @@ const Post = ({ id, content }) => {
               />
             </div>
             <div style={{ marginTop: "1rem" }}>
-              {comments
-                .slice(0, showAllComments ? comments.length : 2)
-                .map((comment, index) => (
-                  <Comment
-                    key={index}
-                    comment={comment}
-                    onDelete={() => handleDeleteComment(index)}
-                    onEdit={(content) => handleEditComment(index, content)}
-                  />
-                ))}
+              {comments.slice(0, showAllComments ? comments.length : 2).map((comment, index) => (
+                <Comment
+                  key={index}
+                  comment={comment}
+                  onDelete={() => handleDeleteComment(index)}
+                  onEdit={(content) => handleEditComment(index, content)}
+                />
+              ))}
             </div>
             <div>
               {comments.length > 2 && (

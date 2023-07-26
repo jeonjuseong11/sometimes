@@ -1,46 +1,22 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { AiOutlineClose } from "react-icons/ai";
-export const LoginWrapper = styled.div`
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-  width: 100%;
-  height: 100vh;
-  box-sizing: border-box;
-`;
-export const LoginForm = styled.form`
-  width: 60%;
-  margin-bottom: 1rem;
-`;
-export const LoginEle = styled.div`
-  display: flex;
-  justify-content: center;
-  text-align: left;
-  width: 100%;
-  margin-bottom: 1rem;
-`;
-export const LoginEleInput = styled.input`
-  padding: 1rem;
-  width: 100%;
-  border-radius: 50px;
-  border: 1px solid #d2d2d2;
-  outline: none;
-`;
-export const LoginBtn = styled.button`
-  padding: 0.8rem;
-  width: 100%;
-  border-radius: 50px;
-  border: 0;
-  font-weight: 650;
-`;
+import { LoginBtn, LoginEle, LoginEleInput, LoginForm, LoginWrapper } from "./Login";
+import axios from "axios";
+
 const Signup = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
+  const navigate = useNavigate();
+  const userInfo = JSON.parse(localStorage.getItem("userInfo"));
+
+  useEffect(() => {
+    if (userInfo) {
+      navigate("/");
+    }
+  }, [userInfo, navigate]);
   const handleSubmit = async (e) => {
     e.preventDefault();
     const payload = {
@@ -49,15 +25,10 @@ const Signup = () => {
       name: name,
     };
     try {
-      const response = await fetch("http://localhost:8080/api/user/join", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(payload),
-      });
-      if (response.ok) {
+      const response = await axios.post("http://localhost:8080/api/user/join", payload);
+      if (response.status === 200) {
         alert("회원가입 성공!");
+        navigate("/login");
       } else {
         alert("회원가입 실패...");
       }

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import axios from "axios";
 
@@ -37,8 +37,9 @@ const SubmitButton = styled.button`
   cursor: ${(props) => (props.disabled ? "not-allowed" : "pointer")};
 `;
 
-const PostForm = () => {
+const PostForm = ({ fetchData }) => {
   const [content, setContent] = useState("");
+  const userInfo = JSON.parse(localStorage.getItem("userInfo"));
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -57,11 +58,17 @@ const PostForm = () => {
 
     try {
       const response = await axios.post(
-        "http://localhost:8080/board",
+        `http://localhost:8080/board/create?content=${newEntry.content}`,
+        {
+          headers: {
+            ACCESS_TOKEN: userInfo.access_TOKEN,
+          },
+        },
         newEntry
       );
       if (response.status === 200) {
         alert("게시물이 성공적으로 작성되었습니다.");
+        fetchData();
       } else {
         alert("게시물 작성에 실패하였습니다.");
       }

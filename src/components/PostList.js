@@ -1,102 +1,57 @@
-import React, { useEffect, useState } from "react";
-import axios from "axios";
+import React from "react";
 import Post from "./Post";
+import styled from "styled-components";
 
-const PostList = () => {
-  const [posts, setPosts] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [isError, setIsError] = useState(false);
+export const PostContainer = styled.div`
+  background-color: #f2f2f2;
+  padding: 1rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  height: 12rem;
+`;
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const accessToken = "YOUR_ACCESS_TOKEN";
-        const response = await axios.get("http://localhost:8080/board/list", {
-          headers: {
-            ACCESS_TOKEN: accessToken,
-          },
-        });
-
-        if (response.status === 200) {
-          setPosts(response.data);
-          setIsLoading(false);
-        } else {
-          console.error("Failed to fetch posts.");
-          setIsLoading(false);
-          setIsError(true);
-        }
-      } catch (error) {
-        console.error("Error occurred while fetching posts:", error);
-        setIsLoading(false);
-        setIsError(true);
-      }
-    };
-
-    fetchData();
-  }, []);
-
+const PostList = ({ posts, isLoading, isError, fetchData }) => {
   if (isLoading) {
     return (
-      <div
-        style={{
-          backgroundColor: "#f2f2f2",
-          padding: "1rem",
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          textAlign: "center",
-          height: "5rem",
-        }}
-      >
+      <PostContainer>
         <h3>Loading...</h3>
-      </div>
+      </PostContainer>
     );
   }
 
   if (isError) {
     return (
-      <div
-        style={{
-          backgroundColor: "#f2f2f2",
-          padding: "1rem",
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          textAlign: "center",
-          height: "5rem",
-        }}
-      >
+      <PostContainer>
         <h2>글 로드에 실패하였습니다.</h2>
-      </div>
+      </PostContainer>
     );
   }
 
-  if (posts.length === 0) {
+  // posts 배열을 id의 역순으로 정렬
+  const sortedPosts = [...posts].sort((a, b) => b.id - a.id);
+
+  // isDeleted가 false인 항목만 필터링
+  const filteredPosts = sortedPosts.filter((post) => !post.isDeleted);
+
+  if (filteredPosts.length === 0) {
     return (
-      <div
-        style={{
-          backgroundColor: "#f2f2f2",
-          padding: "1rem",
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          textAlign: "center",
-          height: "5rem",
-        }}
-      >
+      <PostContainer>
         <h2>글이 없습니다.</h2>
-      </div>
+      </PostContainer>
     );
   }
 
   return (
     <div>
-      {posts.map((post) => (
+      {filteredPosts.map((post) => (
         <Post
           key={post.id}
           id={post.id}
           title={post.title}
           content={post.content}
+          fetchData={fetchData}
         />
       ))}
     </div>

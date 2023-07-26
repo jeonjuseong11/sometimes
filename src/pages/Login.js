@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import styled from "styled-components";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import KakaoLogin from "../assets/icons/kakao_login_medium_narrow.png";
 import axios from "axios";
 
@@ -42,7 +42,14 @@ export const LoginBtn = styled.button`
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
+  const navigate = useNavigate();
+  useEffect(() => {
+    const userInfo = localStorage.getItem("userInfo");
+    if (userInfo) {
+      // userInfo가 있으면 로그인 상태로 간주하고 "/" 경로로 이동
+      navigate("/");
+    }
+  }, [navigate]);
   const handleSubmit = async (e) => {
     e.preventDefault();
     const payload = {
@@ -51,15 +58,14 @@ const Login = () => {
     };
 
     try {
-      const response = await axios.post(
-        "http://localhost:8080/api/user/login",
-        payload
-      );
-
+      const response = await axios.post("http://localhost:8080/api/user/login", payload);
+      localStorage.setItem("userInfo", JSON.stringify(response.data));
       if (response.status === 200) {
         console.log("로그인 성공!");
+        navigate("/");
       } else {
         console.log("로그인 실패...");
+        localStorage.removeItem("userInfo");
       }
 
       setEmail("");
@@ -72,9 +78,9 @@ const Login = () => {
 
   return (
     <LoginWrapper>
-      <Link to="/" style={{ textDecoration: "none", color: "black" }}>
-        <h1>썸타</h1>
-      </Link>
+      {/* <Link to="/" style={{ textDecoration: "none", color: "black" }}> */}
+      <h1>썸타</h1>
+      {/* </Link> */}
       <LoginForm onSubmit={handleSubmit}>
         <LoginEle>
           <LoginEleInput
