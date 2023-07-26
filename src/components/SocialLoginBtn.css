@@ -1,0 +1,14 @@
+.div_social {
+  margin-top: 10px;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+}
+
+.div_social > img,
+.div_social > div {
+  margin: 1rem;
+  width: 2.5rem;
+  height: 2.5rem;
+  cursor: pointer;
+}
