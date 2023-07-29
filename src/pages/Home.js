@@ -43,6 +43,7 @@ function Home() {
   useEffect(() => {
     fetchData();
   }, []);
+
   return (
     <div>
       <Menu />
