@@ -10,7 +10,7 @@ export const PostContainer = styled.div`
   justify-content: center;
   align-items: center;
   text-align: center;
-  height: 12rem;
+  height: 65vh;
 `;
 
 const PostList = ({ posts, isLoading, isError, fetchData }) => {

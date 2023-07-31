@@ -1,12 +1,18 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { FiMoreHorizontal } from "react-icons/fi";
 import DropdownMenu from "./DropdownMenu";
 
-const Comment = ({ comment, onDelete, onEdit }) => {
+const Comment = ({ comment, fetchComments }) => {
   const [isEditing, setIsEditing] = useState(false);
-  const [editedContent, setEditedContent] = useState(comment.content);
+  const [editedContent, setEditedContent] = useState("");
   const [showMenu, setShowMenu] = useState(false);
+
+  useEffect(() => {
+    setEditedContent(comment.content);
+  }, [comment]);
+
+  const apiUrl = "http://localhost:8080/comment";
 
   const handleEditClick = () => {
     setIsEditing(true);
@@ -18,31 +24,62 @@ const Comment = ({ comment, onDelete, onEdit }) => {
   };
 
   const handleSaveEdit = () => {
-    if (editedContent.trim() !== "") {
-      const updatedComment = {
-        id: comment.id,
-        content: editedContent,
-      };
+    const shouldEdit = window.confirm("댓글을 수정하시겠습니까?");
+    if (shouldEdit) {
+      if (editedContent.trim() !== "") {
+        const updatedComment = {
+          id: comment.id,
+          content: editedContent,
+        };
 
+        const params = new URLSearchParams(updatedComment).toString();
+        axios
+          .put(`${apiUrl}?${params}`)
+          .then((response) => {
+            if (response.status === 200) {
+              setIsEditing(false);
+              fetchComments();
+            } else {
+              console.log("댓글 수정 실패");
+            }
+          })
+          .catch((error) => {
+            console.error("Error: ", error);
+          });
+      }
+    }
+  };
+
+  const handleDelete = () => {
+    const shouldDelete = window.confirm("정말로 댓글을 삭제하시겠습니까?");
+    if (shouldDelete) {
+      const params = new URLSearchParams({ id: comment.id }).toString();
       axios
-        .put("http://localhost:8080/comment", updatedComment)
+        .delete(`${apiUrl}?${params}`)
         .then((response) => {
           if (response.status === 200) {
-            onEdit(updatedComment);
+            fetchComments();
           } else {
-            console.log("댓글 수정 실패");
+            console.log("댓글 삭제 실패");
           }
         })
         .catch((error) => {
           console.error("Error: ", error);
         });
-
-      setIsEditing(false);
     }
   };
 
+  const handleContentChange = (e) => {
+    const editedContent = e.target.value;
+    setEditedContent(editedContent);
+  };
+
+  const handleToggleMenu = () => {
+    setShowMenu(!showMenu);
+  };
+
   return (
-    <div style={{ marginBottom: "0.5rem", position: "relative" }}>
+    <div style={{ position: "relative", marginBottom: "1rem" }}>
       {isEditing ? (
         <div>
           <input
@@ -52,10 +89,14 @@ const Comment = ({ comment, onDelete, onEdit }) => {
               marginRight: "0.5rem",
             }}
             value={editedContent}
-            onChange={(e) => setEditedContent(e.target.value)}
+            onChange={handleContentChange}
           />
-          <button onClick={handleSaveEdit}>Save</button>
-          <button onClick={handleCancelEdit}>Cancel</button>
+          <button type="button" onClick={handleSaveEdit}>
+            저장
+          </button>
+          <button type="button" onClick={handleCancelEdit}>
+            취소
+          </button>
         </div>
       ) : (
         <div style={{ display: "flex", position: "relative" }}>
@@ -67,26 +108,30 @@ const Comment = ({ comment, onDelete, onEdit }) => {
               display: "inline-block",
             }}
           >
-            <p style={{ margin: "0" }}>{comment.id}</p>
+            <p style={{ margin: "0" }}>{comment.userId}</p>
             <p style={{ margin: "0" }}>{comment.content}</p>
           </div>
           <div
             style={{ position: "absolute", right: 0, top: 0 }}
-            onMouseEnter={() => setShowMenu(true)}
-            onMouseLeave={() => setShowMenu(false)}
+            onMouseEnter={handleToggleMenu}
+            onMouseLeave={handleToggleMenu}
           >
-            <button onClick={() => setShowMenu((prev) => !prev)}>
+            <button
+              type="button"
+              onClick={handleToggleMenu}
+              style={{ backgroundColor: "transparent" }}
+            >
               <FiMoreHorizontal />
             </button>
             {showMenu && (
               <DropdownMenu
                 onEdit={() => {
-                  setShowMenu(false);
+                  handleToggleMenu();
                   handleEditClick();
                 }}
                 onDelete={() => {
-                  setShowMenu(false);
-                  onDelete();
+                  handleToggleMenu();
+                  handleDelete();
                 }}
               />
             )}

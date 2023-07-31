@@ -6,13 +6,13 @@ const DropdownMenu = ({ onEdit, onDelete }) => {
       className="dropdown-menu"
       style={{
         position: "absolute",
-        top: "100%",
-        right: 0,
+        right: "1.4rem",
+        top: "1.5rem",
         backgroundColor: "white",
         border: "1px solid #ccc",
         borderRadius: "5px",
         width: "3rem",
-        zIndex: 2, // Ensure the menu is above the content
+        zIndex: 2,
       }}
     >
       <button onClick={onEdit} style={{ width: "100%" }}>
