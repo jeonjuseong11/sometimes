@@ -7,6 +7,7 @@ import Notification from "./pages/Notification";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import axios from "axios";
+import Approval from "./pages/Approval";
 function App() {
   const userInfo = JSON.parse(localStorage.getItem("userInfo"));
 
@@ -23,6 +24,7 @@ function App() {
         <Route exact path="/signup" element={<Signup />} />
         <Route element={<Menu />}>
           <Route exact path="/notification" element={<Notification />} />
+          <Route exact path="/approval" element={<Approval />} />
         </Route>
       </Routes>
     </div>

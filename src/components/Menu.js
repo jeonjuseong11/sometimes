@@ -5,60 +5,26 @@ import Navbar from "./Navbar";
 const Menu = () => {
   const [selectedMenu, setSelectedMenu] = useState("게시물");
   const location = useLocation();
+  const userInfo = JSON.parse(localStorage.getItem("userInfo"));
 
   const handleMenuClick = (menu) => {
     setSelectedMenu(menu);
   };
+
   useEffect(() => {
-    // 라우터의 주소가 "/notification"이면 공지 메뉴를 선택하도록 합니다.
-    // 그 외에는 "/notification"이 아니면 게시물 메뉴를 선택하도록 합니다.
-    setSelectedMenu(location.pathname === "/notification" ? "공지" : "게시물");
+    // 라우터의 주소에 따라서 선택된 메뉴를 변경합니다.
+    if (location.pathname === "/notification") {
+      setSelectedMenu("내가 쓴 글");
+    } else if (location.pathname === "/approval") {
+      setSelectedMenu("승인");
+    } else {
+      setSelectedMenu("게시물");
+    }
   }, [location.pathname]);
+
   return (
     <div style={{ margin: "0" }}>
       <Navbar />
-      <div style={{ marginBottom: "1rem" }}>
-        <div
-          style={{
-            backgroundColor: "#f2f2f2",
-            height: "10rem",
-            borderRadius: "0 0 10px 10px",
-          }}
-        ></div>
-        <div
-          style={{
-            backgroundColor: "white",
-            textAlign: "center",
-            height: "5rem",
-          }}
-        >
-          <div
-            style={{
-              position: "relative",
-              borderRadius: "100px",
-              backgroundColor: "gray",
-              margin: "0 auto 20px",
-              width: "10rem",
-              height: "10rem",
-              top: "-5rem",
-              border: "5px solid white",
-            }}
-          >
-            이미지
-          </div>
-        </div>
-        <div style={{ textAlign: "center" }}>
-          <h3>Sometimes</h3>
-          <p>
-            학생들의 의견을 자유롭게 소통하기 위해 <br />
-            제작된 서비스 입니다 <br /> 우리 학교에 관한 모든 것을 전해
-            드립니다!
-            <br />
-            [익명제보,맛집,알바,거래,소식 등등] <br />
-            우리 학교의 특별한 이야기를 보러오세요!
-          </p>
-        </div>
-      </div>
       <div className="menu">
         <ul className="menu-list">
           <Link to="/" style={{ textDecoration: "none" }}>
@@ -74,21 +40,29 @@ const Menu = () => {
           </Link>
           <Link to="/notification" style={{ textDecoration: "none" }}>
             <li
-              className={selectedMenu === "공지" ? "active" : ""}
-              onClick={() => handleMenuClick("공지")}
+              className={selectedMenu === "내가 쓴 글" ? "active" : ""}
+              onClick={() => handleMenuClick("내가 쓴 글")}
               style={{
-                color: selectedMenu === "공지" ? "#007bff" : "black",
+                color: selectedMenu === "내가 쓴 글" ? "#007bff" : "black",
               }}
             >
-              공지
+              내가 쓴 글
             </li>
           </Link>
-          {/* <li
-          className={selectedMenu === "사진" ? "active" : ""}
-          onClick={() => handleMenuClick("사진")}
-        >
-          사진
-        </li> */}
+          {/* 사용자 역할이 1일 때만 "승인 대기" 메뉴를 표시합니다. */}
+          {userInfo && userInfo.user_ROLE === 1 && (
+            <Link to="/approval" style={{ textDecoration: "none" }}>
+              <li
+                className={selectedMenu === "승인" ? "active" : ""}
+                onClick={() => handleMenuClick("승인")}
+                style={{
+                  color: selectedMenu === "승인" ? "#007bff" : "black",
+                }}
+              >
+                승인 대기
+              </li>
+            </Link>
+          )}
         </ul>
       </div>
       <main>
