@@ -1,64 +1,96 @@
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Post from "./Post";
-import styled from "styled-components";
+import axios from "axios";
 
-// 스타일드 컴포넌트를 사용하여 스타일을 적용한 컨테이너를 생성합니다.
-export const PostContainer = styled.div`
-  background-color: #f2f2f2;
-  padding: 1rem;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-  height: 65vh;
-`;
+const PostList = () => {
+  const [posts, setPosts] = useState([]);
+  const [currentPage, setCurrentPage] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
+  const userInfo = JSON.parse(localStorage.getItem("userInfo"));
+  const observer = useRef();
+  const lastPostRef = useRef();
 
-const PostList = ({ posts, isLoading, isError, fetchData }) => {
-  // 만약 데이터 로딩 중이면 로딩 메시지를 표시합니다.
-  if (isLoading) {
-    return (
-      <PostContainer>
-        <h3>Loading...</h3>
-      </PostContainer>
-    );
-  }
+  const fetchPosts = async () => {
+    try {
+      setIsLoading(true);
+      const response = await axios.get(
+        `http://localhost:8080/board/pageList?page=${currentPage}&size=5`,
+        {
+          headers: {
+            ACCESS_TOKEN: userInfo.access_TOKEN,
+          },
+        }
+      );
+      if (response.status === 200) {
+        const newPosts = response.data.data.content;
+        if (newPosts.length === 0) {
+          setHasMore(false);
+        } else {
+          setPosts((prevPosts) => [...prevPosts, ...newPosts]);
+          setCurrentPage((prevPage) => prevPage + 1);
+        }
+      } else {
+        alert("게시글 불러오기 실패");
+      }
+    } catch (error) {
+      console.error("게시글 가져오기 에러:", error);
+      alert("게시글 불러오기 실패");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-  // 만약 데이터 로딩 중 에러가 발생하면 에러 메시지를 표시합니다.
-  if (isError) {
-    return (
-      <PostContainer>
-        <h2>글 로드에 실패하였습니다.</h2>
-      </PostContainer>
-    );
-  }
+  useEffect(() => {
+    fetchPosts();
+  }, []);
 
-  // 포스트들을 id 기준으로 역순으로 정렬합니다.
+  useEffect(() => {
+    if (isLoading) return;
 
-  const sortedPosts = posts?.sort((a, b) => b.id - a.id);
-  // isDeleted가 false인 항목만 필터링하여 새로운 배열을 만듭니다.
-  const filteredPosts = sortedPosts?.filter((post) => !post.isDeleted);
+    const options = {
+      root: null,
+      rootMargin: "20px",
+      threshold: 1.0,
+    };
 
-  // 만약 필터링된 포스트가 없다면 글이 없다는 메시지를 표시합니다.
-  if (filteredPosts?.length === 0) {
-    return (
-      <PostContainer>
-        <h2>글이 없습니다.</h2>
-      </PostContainer>
-    );
-  }
+    const handleObserver = (entries) => {
+      const target = entries[0];
+      if (target.isIntersecting && hasMore) {
+        fetchPosts();
+      }
+    };
 
-  // 포스트 목록을 렌더링합니다.
+    observer.current = new IntersectionObserver(handleObserver, options);
+    if (lastPostRef.current) {
+      observer.current.observe(lastPostRef.current);
+    }
+
+    return () => {
+      if (observer.current) {
+        observer.current.disconnect();
+      }
+    };
+  }, [isLoading, hasMore]);
+
   return (
     <div>
-      {filteredPosts?.map((post) => (
-        <Post
-          key={post.id}
-          id={post.id}
-          title={post.title}
-          content={post.content}
-          fetchData={fetchData}
-        />
-      ))}
+      {posts.map((post, index) => {
+        if (index === posts.length - 1) {
+          return (
+            <div key={index} ref={lastPostRef}>
+              <Post {...post} style={{ paddingBottom: "1rem" }} />
+            </div>
+          );
+        } else {
+          return (
+            <div key={index}>
+              <Post {...post} />
+            </div>
+          );
+        }
+      })}
+      {isLoading && <div>Loading...</div>}
     </div>
   );
 };

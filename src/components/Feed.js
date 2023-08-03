@@ -1,6 +1,6 @@
 import React from "react";
 import "../styles.css";
-import PostList from "./Post";
+import PostList from "./PostList";
 
 const Feed = () => {
   return (

@@ -164,7 +164,7 @@ const Post = ({ id, title, content, category, fetchData }) => {
   };
 
   return (
-    <div style={{ padding: "1rem", paddingBottom: "0", backgroundColor: "#f2f2f2" }}>
+    <div style={{ padding: "1rem", paddingTop: "0", backgroundColor: "#f2f2f2" }}>
       <article
         className="Post"
         style={{

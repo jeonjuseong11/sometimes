@@ -83,9 +83,7 @@ const PostForm = ({ fetchData }) => {
     <div
       style={{
         backgroundColor: "#f2f2f2",
-        paddingTop: "1rem",
         padding: "1rem",
-        paddingBottom: "0",
       }}
     >
       <StyledPostForm onSubmit={handleSubmit}>
