@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import axios from "axios";
 import { BsCheckLg } from "react-icons/bs";
 import { ImCancelCircle } from "react-icons/im";
@@ -49,8 +49,32 @@ const RejectButton = styled(ApprovalButton)`
   color: red;
 `;
 
-const ApprovalPost = ({ id, title, content, category, fetchData }) => {
+const ApprovalPost = ({ id, content, fetchData }) => {
   const userInfo = JSON.parse(localStorage.getItem("userInfo"));
+  const [state, setState] = useState();
+  const acceptPost = async (state) => {
+    try {
+      const response = await axios.put(
+        `http://localhost:8080/board/changeState/${id}?state=${state}`,
+        null,
+        {
+          headers: {
+            ACCESS_TOKEN: userInfo.access_TOKEN,
+          },
+        }
+      );
+
+      if (response.status === 200) {
+        alert("게시글 확인 완료");
+        fetchData();
+      } else {
+        alert("게시글 확인 실패");
+      }
+    } catch (error) {
+      console.error("Error occurred while editing the post:", error);
+      alert("게시글 확인 실패");
+    }
+  };
 
   return (
     <Container>
@@ -61,12 +85,11 @@ const ApprovalPost = ({ id, title, content, category, fetchData }) => {
         </div>
 
         <ButtonContainer>
-          <div>{/* Your other buttons can be placed here if needed */}</div>
           <div style={{ display: "flex" }}>
-            <ApproveButton hoverColor="#1a47c9">
+            <ApproveButton onClick={() => acceptPost(1)} hoverColor="#1a47c9">
               <BsCheckLg />
             </ApproveButton>
-            <RejectButton hoverColor="#ff1a1a">
+            <RejectButton onClick={() => acceptPost(2)} hoverColor="#ff1a1a">
               <ImCancelCircle />
             </RejectButton>
           </div>

@@ -49,7 +49,7 @@ const ApprovalList = ({ posts, isLoading, isError, fetchData }) => {
 
   // 포스트 목록을 렌더링합니다.
   return (
-    <div>
+    <div style={{ height: "89vh" }}>
       {filteredPosts?.map((post) => (
         <ApprovalPost
           key={post.id}

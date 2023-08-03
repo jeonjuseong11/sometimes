@@ -66,7 +66,7 @@ const Menu = () => {
         </ul>
       </div>
       <main>
-        <div className="app__body">
+        <div className="app__body" style={{ background: "#f2f2f2" }}>
           <Outlet />
         </div>
       </main>
