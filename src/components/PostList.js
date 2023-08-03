@@ -4,31 +4,33 @@ import axios from "axios";
 
 const PostList = () => {
   const [posts, setPosts] = useState([]);
-  const [currentPage, setCurrentPage] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
+  const [currentPage, setCurrentPage] = useState(0); // Added current page state
   const userInfo = JSON.parse(localStorage.getItem("userInfo"));
   const observer = useRef();
   const lastPostRef = useRef();
 
-  const fetchPosts = async () => {
+  const fetchPosts = async (page) => {
     try {
       setIsLoading(true);
-      const response = await axios.get(
-        `http://localhost:8080/board/pageList?page=${currentPage}&size=5`,
-        {
-          headers: {
-            ACCESS_TOKEN: userInfo.access_TOKEN,
-          },
-        }
-      );
+      const response = await axios.get(`http://localhost:8080/board/pageList?page=${page}&size=5`, {
+        headers: {
+          ACCESS_TOKEN: userInfo.access_TOKEN,
+        },
+      });
       if (response.status === 200) {
         const newPosts = response.data.data.content;
         if (newPosts.length === 0) {
           setHasMore(false);
         } else {
-          setPosts((prevPosts) => [...prevPosts, ...newPosts]);
-          setCurrentPage((prevPage) => prevPage + 1);
+          // Check for duplicates and add only new posts
+          setPosts((prevPosts) => {
+            const postIds = prevPosts.map((post) => post.id);
+            const filteredPosts = newPosts.filter((post) => !postIds.includes(post.id));
+            return [...prevPosts, ...filteredPosts];
+          });
+          setCurrentPage(page); // Update the current page after successful fetch
         }
       } else {
         alert("게시글 불러오기 실패");
@@ -42,7 +44,7 @@ const PostList = () => {
   };
 
   useEffect(() => {
-    fetchPosts();
+    fetchPosts(0);
   }, []);
 
   useEffect(() => {
@@ -57,9 +59,13 @@ const PostList = () => {
     const handleObserver = (entries) => {
       const target = entries[0];
       if (target.isIntersecting && hasMore) {
-        fetchPosts();
+        fetchPosts(currentPage + 1);
       }
     };
+
+    if (observer.current) {
+      observer.current.disconnect();
+    }
 
     observer.current = new IntersectionObserver(handleObserver, options);
     if (lastPostRef.current) {
@@ -71,7 +77,7 @@ const PostList = () => {
         observer.current.disconnect();
       }
     };
-  }, [isLoading, hasMore]);
+  }, [isLoading, hasMore, currentPage]);
 
   return (
     <div>

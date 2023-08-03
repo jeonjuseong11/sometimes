@@ -20,7 +20,7 @@ function Home() {
     const userInfo = JSON.parse(localStorage.getItem("userInfo"));
 
     try {
-      const response = await axios.get(`http://localhost:8080/board/list/0`, {
+      const response = await axios.get(`http://localhost:8080/board/list/1`, {
         headers: {
           ACCESS_TOKEN: userInfo.access_TOKEN,
         },
