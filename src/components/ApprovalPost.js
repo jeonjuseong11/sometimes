@@ -49,7 +49,7 @@ const RejectButton = styled(ApprovalButton)`
   color: red;
 `;
 
-const ApprovalPost = ({ id, content, fetchData }) => {
+const ApprovalPost = ({ userName, id, content, fetchData }) => {
   const userInfo = JSON.parse(localStorage.getItem("userInfo"));
   const [state, setState] = useState();
   const acceptPost = async (state) => {
@@ -80,7 +80,7 @@ const ApprovalPost = ({ id, content, fetchData }) => {
     <Container>
       <Article>
         <div>
-          <p style={{ margin: "0 0 1rem" }}>{id}</p>
+          <p style={{ margin: "0 0 1rem" }}>{userName}</p>
           <p style={{ margin: "0", fontSize: "1rem" }}>{content}</p>
         </div>
 

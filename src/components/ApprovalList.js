@@ -54,6 +54,7 @@ const ApprovalList = ({ posts, isLoading, isError, fetchData }) => {
         <ApprovalPost
           key={post.id}
           id={post.id}
+          userName={post.userName}
           title={post.title}
           content={post.content}
           fetchData={fetchData}
