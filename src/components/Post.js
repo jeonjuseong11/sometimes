@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { BsChat, BsChatDots, BsSend } from "react-icons/bs";
 import { FiMoreHorizontal } from "react-icons/fi";
 import Comment from "./Comment";
@@ -8,7 +8,7 @@ import DropdownMenu from "./DropdownMenu";
 import { PostFormTextArea } from "./PostForm";
 import axios from "axios";
 
-const Post = ({ id, title, content, category, fetchData }) => {
+const Post = ({ id, userName, title, content, category, fetchPosts, setPosts }) => {
   const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState("");
   const [showAllComments, setShowAllComments] = useState(false);
@@ -19,19 +19,20 @@ const Post = ({ id, title, content, category, fetchData }) => {
   const [inputFocused, setInputFocused] = useState(false);
   const [addingComment, setAddingComment] = useState(false);
   const [showComment, setShowComment] = useState(false);
-  const userInfo = JSON.parse(localStorage.getItem("userInfo"));
+  const [userInfo, setUserInfo] = useState(null);
   const inputRef = useRef(null);
 
   const handleComment = () => {
     setShowComment(!showComment);
-    if (showComment === false) {
+    if (showComment === false && !commentsLoaded) {
       fetchComments();
     }
   };
+
   const fetchComments = async () => {
     try {
       const response = await axios.get(`http://localhost:8080/comment/list?boardId=${id}`);
-      if (response.status === 200) {
+      if (response.data.success) {
         setComments(response.data.data);
         setCommentsLoaded(true);
       } else {
@@ -49,21 +50,24 @@ const Post = ({ id, title, content, category, fetchData }) => {
     if (newComment.trim() !== "") {
       try {
         setAddingComment(true);
-        setShowComment(true); // 댓글을 추가하고 댓글 창을 보여줌
+        setNewComment("");
 
         const response = await axios.post(
           `http://localhost:8080/comment?boardId=${id}&content=${newComment}`,
+          null,
           {
-            boardId: id,
-            content: newComment,
+            headers: {
+              ACCESS_TOKEN: userInfo.access_TOKEN,
+            },
           }
         );
 
         if (response.data.success) {
           const newCommentData = response.data.data;
-          setComments((prevComments) => [newCommentData, ...prevComments]);
-          setNewComment("");
+          setComments((prevComments) => [...prevComments, newCommentData]);
+          setCommentsLoaded(true);
           setInputFocused(false);
+          setShowComment(true); // 댓글을 추가하고 댓글 창을 보여줌
 
           inputRef.current.blur();
         } else {
@@ -127,9 +131,12 @@ const Post = ({ id, title, content, category, fetchData }) => {
         }
       );
 
-      if (response.status === 200) {
+      if (response.data.success) {
+        setPosts((prevPosts) =>
+          prevPosts.filter((post) => post.id === id && post.content === editedContent)
+        );
         alert("게시글이 성공적으로 수정되었습니다.");
-        fetchData();
+        fetchPosts(0); // 게시글 목록을 갱신
         setEditing(false);
       } else {
         alert("게시글 수정에 실패하였습니다.");
@@ -144,15 +151,16 @@ const Post = ({ id, title, content, category, fetchData }) => {
     const shouldDelete = window.confirm("정말로 이 게시글을 삭제하시겠습니까?");
     if (shouldDelete) {
       try {
-        const response = await axios.put(`http://localhost:8080/board/delete?id=${id}`, {
+        const response = await axios.put(`http://localhost:8080/board/delete?id=${id}`, null, {
           headers: {
             ACCESS_TOKEN: userInfo.access_TOKEN,
           },
         });
 
         if (response.status === 200) {
+          setPosts((prevPosts) => prevPosts.filter((post) => post.id !== id)); // 상태에서 해당 게시물을 제거
           alert("게시글이 성공적으로 삭제되었습니다.");
-          fetchData();
+          fetchPosts(0); // 게시글 목록을 갱신
         } else {
           alert("게시글 삭제에 실패하였습니다.");
         }
@@ -162,6 +170,10 @@ const Post = ({ id, title, content, category, fetchData }) => {
       }
     }
   };
+
+  useEffect(() => {
+    setUserInfo(JSON.parse(localStorage.getItem("userInfo")));
+  }, []);
 
   return (
     <div style={{ padding: "1rem", paddingTop: "0", backgroundColor: "#f2f2f2" }}>
@@ -173,14 +185,14 @@ const Post = ({ id, title, content, category, fetchData }) => {
         }}
       >
         {editing ? (
-          <>
+          <div style={{ padding: "1rem" }}>
             <PostFormTextArea
               value={editedContent}
               onChange={(e) => setEditedContent(e.target.value)}
             />
             <button onClick={handleEditPost}>저장</button>
             <button onClick={handleCancelEdit}>취소</button>
-          </>
+          </div>
         ) : (
           <div
             style={{
@@ -191,7 +203,7 @@ const Post = ({ id, title, content, category, fetchData }) => {
             }}
           >
             <div>
-              <p style={{ margin: "0 0 1rem" }}>{id}</p>
+              <p style={{ margin: "0 0 1rem" }}>{userName}</p>
               <p style={{ margin: "0", fontSize: "1rem" }}>{content}</p>
             </div>
             <div
@@ -264,8 +276,8 @@ const Post = ({ id, title, content, category, fetchData }) => {
                   borderRadius: "10px",
                   color: "#1E90FF",
                   position: "absolute",
-                  right: "1rem",
-                  top: "0.5rem",
+                  right: "1.5rem",
+                  top: "1.5rem",
                   opacity: inputFocused ? "1" : "0",
                   transition: "opacity 0.3s ease-in-out",
                   cursor: "pointer",
@@ -280,7 +292,12 @@ const Post = ({ id, title, content, category, fetchData }) => {
                   {comments
                     .slice(0, showAllComments ? comments.length : 2)
                     .map((comment, index) => (
-                      <Comment key={index} comment={comment} fetchComments={fetchComments} />
+                      <Comment
+                        key={index}
+                        boardId={id}
+                        comment={comment}
+                        fetchComments={fetchComments}
+                      />
                     ))}
 
                   {comments.length > 2 && (
@@ -302,7 +319,9 @@ const Post = ({ id, title, content, category, fetchData }) => {
                   )}
                 </div>
               ) : (
-                <p>댓글이 없습니다</p>
+                <div style={{ padding: "1rem" }}>
+                  <p>댓글이 없습니다</p>
+                </div>
               )
             ) : (
               <></>

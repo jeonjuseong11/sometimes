@@ -1,12 +1,17 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef } from "react";
 import Post from "./Post";
 import axios from "axios";
 
-const PostList = () => {
-  const [posts, setPosts] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [hasMore, setHasMore] = useState(true);
-  const [currentPage, setCurrentPage] = useState(0); // Added current page state
+const PostList = ({
+  posts,
+  setPosts,
+  setIsLoading,
+  isLoading,
+  hasMore,
+  setHasMore,
+  currentPage,
+  setCurrentPage,
+}) => {
   const userInfo = JSON.parse(localStorage.getItem("userInfo"));
   const observer = useRef();
   const lastPostRef = useRef();
@@ -21,16 +26,16 @@ const PostList = () => {
       });
       if (response.status === 200) {
         const newPosts = response.data.data.content;
+
         if (newPosts.length === 0) {
           setHasMore(false);
         } else {
-          // Check for duplicates and add only new posts
           setPosts((prevPosts) => {
             const postIds = prevPosts.map((post) => post.id);
             const filteredPosts = newPosts.filter((post) => !postIds.includes(post.id));
             return [...prevPosts, ...filteredPosts];
           });
-          setCurrentPage(page); // Update the current page after successful fetch
+          setCurrentPage(page);
         }
       } else {
         alert("게시글 불러오기 실패");
@@ -78,20 +83,27 @@ const PostList = () => {
       }
     };
   }, [isLoading, hasMore, currentPage]);
-
+  useEffect(() => {
+    console.log(posts);
+  }, [posts]);
   return (
     <div>
       {posts.map((post, index) => {
         if (index === posts.length - 1) {
           return (
-            <div key={index} ref={lastPostRef}>
-              <Post {...post} style={{ paddingBottom: "1rem" }} />
+            <div key={post.id} ref={lastPostRef}>
+              <Post
+                {...post}
+                style={{ paddingBottom: "1rem" }}
+                fetchPosts={fetchPosts}
+                setPosts={setPosts}
+              />
             </div>
           );
         } else {
           return (
-            <div key={index}>
-              <Post {...post} />
+            <div key={post.id}>
+              <Post {...post} fetchPosts={fetchPosts} setPosts={setPosts} />
             </div>
           );
         }

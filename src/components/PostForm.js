@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
 import axios from "axios";
 
@@ -37,9 +37,40 @@ const SubmitButton = styled.button`
   cursor: ${(props) => (props.disabled ? "not-allowed" : "pointer")};
 `;
 
-const PostForm = ({ fetchData }) => {
+const PostForm = ({ posts, setPosts, setIsLoading, setHasMore, setCurrentPage }) => {
   const [content, setContent] = useState("");
   const userInfo = JSON.parse(localStorage.getItem("userInfo"));
+
+  const fetchPosts = async () => {
+    try {
+      setIsLoading(true);
+      const response = await axios.get(`http://localhost:8080/board/pageList?page=0&size=5`, {
+        headers: {
+          ACCESS_TOKEN: userInfo.access_TOKEN,
+        },
+      });
+      if (response.status === 200) {
+        const newPosts = response.data.data.content;
+        if (newPosts.length === 0) {
+          setHasMore(false);
+        } else {
+          // Check for duplicates and add only new posts
+          setPosts((prevPosts) => {
+            const postIds = prevPosts.map((post) => post.id);
+            const filteredPosts = newPosts.filter((post) => !postIds.includes(post.id));
+            return [...filteredPosts, ...prevPosts];
+          });
+        }
+      } else {
+        alert("게시글 불러오기 실패");
+      }
+    } catch (error) {
+      console.error("게시글 가져오기 에러:", error);
+      alert("게시글 불러오기 실패");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -51,24 +82,22 @@ const PostForm = ({ fetchData }) => {
 
     const newEntry = {
       id: 1,
-      title: "제목",
       content: content,
-      category: "카테고리",
     };
 
     try {
       const response = await axios.post(
         `http://localhost:8080/board/create?content=${newEntry.content}`,
+        newEntry,
         {
           headers: {
             ACCESS_TOKEN: userInfo.access_TOKEN,
           },
-        },
-        newEntry
+        }
       );
-      if (response.status === 200) {
+      if (response.data.success) {
         alert("게시물이 성공적으로 작성되었습니다.");
-        fetchData();
+        fetchPosts();
       } else {
         alert("게시물 작성에 실패하였습니다.");
       }
