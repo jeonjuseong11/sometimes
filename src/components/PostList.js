@@ -2,51 +2,10 @@ import React, { useEffect, useRef } from "react";
 import Post from "./Post";
 import axios from "axios";
 
-const PostList = ({
-  posts,
-  setPosts,
-  setIsLoading,
-  isLoading,
-  hasMore,
-  setHasMore,
-  currentPage,
-  setCurrentPage,
-}) => {
+const PostList = ({ posts, setPosts, isLoading, hasMore, currentPage, fetchPosts }) => {
   const userInfo = JSON.parse(localStorage.getItem("userInfo"));
   const observer = useRef();
   const lastPostRef = useRef();
-
-  const fetchPosts = async (page) => {
-    try {
-      setIsLoading(true);
-      const response = await axios.get(`http://localhost:8080/board/pageList?page=${page}&size=5`, {
-        headers: {
-          ACCESS_TOKEN: userInfo.access_TOKEN,
-        },
-      });
-      if (response.status === 200) {
-        const newPosts = response.data.data.content;
-
-        if (newPosts.length === 0) {
-          setHasMore(false);
-        } else {
-          setPosts((prevPosts) => {
-            const postIds = prevPosts.map((post) => post.id);
-            const filteredPosts = newPosts.filter((post) => !postIds.includes(post.id));
-            return [...prevPosts, ...filteredPosts];
-          });
-          setCurrentPage(page);
-        }
-      } else {
-        alert("게시글 불러오기 실패");
-      }
-    } catch (error) {
-      console.error("게시글 가져오기 에러:", error);
-      alert("게시글 불러오기 실패");
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   useEffect(() => {
     fetchPosts(0);
