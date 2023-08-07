@@ -25,7 +25,10 @@ const Signup = () => {
       name: name,
     };
     try {
-      const response = await axios.post("http://localhost:8080/api/user/join", payload);
+      const response = await axios.post(
+        "https://io065rlls1.execute-api.ap-northeast-2.amazonaws.com/api/user/join",
+        payload
+      );
       if (response.status === 200) {
         alert("회원가입 성공!");
         navigate("/login");

@@ -31,7 +31,9 @@ const Post = ({ id, userName, title, content, category, fetchPosts, setPosts }) 
 
   const fetchComments = async () => {
     try {
-      const response = await axios.get(`http://localhost:8080/comment/list?boardId=${id}`);
+      const response = await axios.get(
+        `https://io065rlls1.execute-api.ap-northeast-2.amazonaws.com/comment/list?boardId=${id}`
+      );
       if (response.data.success) {
         setComments(response.data.data);
         setCommentsLoaded(true);
@@ -53,7 +55,7 @@ const Post = ({ id, userName, title, content, category, fetchPosts, setPosts }) 
         setNewComment("");
 
         const response = await axios.post(
-          `http://localhost:8080/comment?boardId=${id}&content=${newComment}`,
+          `https://io065rlls1.execute-api.ap-northeast-2.amazonaws.com/comment?boardId=${id}&content=${newComment}`,
           null,
           {
             headers: {
@@ -118,7 +120,7 @@ const Post = ({ id, userName, title, content, category, fetchPosts, setPosts }) 
 
     try {
       const response = await axios.put(
-        `http://localhost:8080/board/update?id=${id}&content=${editedContent}`,
+        `https://io065rlls1.execute-api.ap-northeast-2.amazonaws.com/board/update?id=${id}&content=${editedContent}`,
         {
           title: title,
           content: editedContent,
@@ -151,11 +153,15 @@ const Post = ({ id, userName, title, content, category, fetchPosts, setPosts }) 
     const shouldDelete = window.confirm("정말로 이 게시글을 삭제하시겠습니까?");
     if (shouldDelete) {
       try {
-        const response = await axios.put(`http://localhost:8080/board/delete?id=${id}`, null, {
-          headers: {
-            ACCESS_TOKEN: userInfo.access_TOKEN,
-          },
-        });
+        const response = await axios.put(
+          `https://io065rlls1.execute-api.ap-northeast-2.amazonaws.com/board/delete?id=${id}`,
+          null,
+          {
+            headers: {
+              ACCESS_TOKEN: userInfo.access_TOKEN,
+            },
+          }
+        );
 
         if (response.status === 200) {
           setPosts((prevPosts) => prevPosts.filter((post) => post.id !== id)); // 상태에서 해당 게시물을 제거

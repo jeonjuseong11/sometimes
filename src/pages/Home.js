@@ -23,11 +23,14 @@ function Home() {
   const fetchPosts = async (page) => {
     try {
       setIsLoading(true);
-      const response = await axios.get(`http://localhost:8080/board/pageList?page=${page}&size=5`, {
-        headers: {
-          ACCESS_TOKEN: userInfo.access_TOKEN,
-        },
-      });
+      const response = await axios.get(
+        `https://io065rlls1.execute-api.ap-northeast-2.amazonaws.com/board/pageList?page=${page}&size=5`,
+        {
+          headers: {
+            ACCESS_TOKEN: userInfo.access_TOKEN,
+          },
+        }
+      );
       if (response.status === 200) {
         const newPosts = response.data.data.content;
 

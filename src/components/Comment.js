@@ -15,7 +15,7 @@ const Comment = ({ comment, fetchComments, boardId }) => {
     setEditedContent(comment.content);
   }, [comment]);
 
-  const apiUrl = "http://localhost:8080/comment"; //댓글 url 설정
+  const apiUrl = "https://io065rlls1.execute-api.ap-northeast-2.amazonaws.com/comment"; //댓글 url 설정
 
   const handleEditClick = () => {
     if (!isReplying) {

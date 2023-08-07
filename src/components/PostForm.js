@@ -44,11 +44,14 @@ const PostForm = ({ posts, setPosts, setIsLoading, setHasMore, setCurrentPage })
   const fetchPosts = async () => {
     try {
       setIsLoading(true);
-      const response = await axios.get(`http://localhost:8080/board/pageList?page=0&size=5`, {
-        headers: {
-          ACCESS_TOKEN: userInfo.access_TOKEN,
-        },
-      });
+      const response = await axios.get(
+        `https://io065rlls1.execute-api.ap-northeast-2.amazonaws.com/board/pageList?page=0&size=5`,
+        {
+          headers: {
+            ACCESS_TOKEN: userInfo.access_TOKEN,
+          },
+        }
+      );
       if (response.status === 200) {
         const newPosts = response.data.data.content;
         if (newPosts.length === 0) {
@@ -87,7 +90,7 @@ const PostForm = ({ posts, setPosts, setIsLoading, setHasMore, setCurrentPage })
 
     try {
       const response = await axios.post(
-        `http://localhost:8080/board/create?content=${newEntry.content}`,
+        `https://io065rlls1.execute-api.ap-northeast-2.amazonaws.com/board/create?content=${newEntry.content}`,
         newEntry,
         {
           headers: {

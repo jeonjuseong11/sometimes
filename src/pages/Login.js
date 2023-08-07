@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
 import { Link, useNavigate } from "react-router-dom";
-import KakaoLogin from "../assets/icons/kakao_login_medium_narrow.png";
+import KakaoImage from "../assets/icons/kakao_login_medium_narrow.png";
 import axios from "axios";
+import KakaoLogin from "../components/KakaoLogin";
 
 export const LoginWrapper = styled.div`
   display: flex;
@@ -39,9 +40,19 @@ export const LoginBtn = styled.button`
   border: 0;
   font-weight: 650;
 `;
+const KAKAO_LOGIN_API_URL = "https://kauth.kakao.com/oauth/authorize";
+
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+
+  const handleKakaoLogin = () => {
+    const clientId = "179adc4de9c40e8d6b2b1d4adc4b5451";
+    const redirectUri = "https://io065rlls1.execute-api.ap-northeast-2.amazonaws.com/"; // Redirect URI 설정 필요
+
+    const authUrl = `${KAKAO_LOGIN_API_URL}?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=code`;
+    window.location.href = authUrl;
+  };
   const navigate = useNavigate();
   useEffect(() => {
     const userInfo = localStorage.getItem("userInfo");
@@ -58,7 +69,10 @@ const Login = () => {
     };
 
     try {
-      const response = await axios.post("http://localhost:8080/api/user/login", payload);
+      const response = await axios.post(
+        "https://io065rlls1.execute-api.ap-northeast-2.amazonaws.com/api/user/login",
+        payload
+      );
       localStorage.setItem("userInfo", JSON.stringify(response.data));
       if (response.status === 200) {
         console.log("로그인 성공!");
@@ -116,7 +130,7 @@ const Login = () => {
           justifyContent: "center",
         }}
       >
-        <img src={KakaoLogin} />
+        <img src={KakaoImage} onClick={handleKakaoLogin} />
       </div>
     </LoginWrapper>
   );
