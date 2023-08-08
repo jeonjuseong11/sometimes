@@ -18,17 +18,17 @@ const Menu = () => {
     // } else
     if (location.pathname === "/approval") {
       setSelectedMenu("승인");
-    } else {
+    } else if (location.pathname === "/home") {
       setSelectedMenu("게시물");
     }
   }, [location.pathname]);
 
   return (
-    <div style={{ margin: "0" }}>
+    <div style={{ margin: "0", backgroundColor: "white" }}>
       <Navbar />
       <div className="menu">
         <ul className="menu-list">
-          <Link to="/" style={{ textDecoration: "none" }}>
+          <Link to="/home" style={{ textDecoration: "none" }}>
             <li
               className={selectedMenu === "게시물" ? "active" : ""}
               onClick={() => handleMenuClick("게시물")}

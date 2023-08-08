@@ -22,7 +22,7 @@ const Navbar = () => {
   const handleLogout = () => {
     localStorage.removeItem("userInfo"); // userInfo를 삭제하여 로그아웃 상태로 설정
     setUserNick(""); // 사용자 닉네임 상태 초기화
-    navigate("/login"); // 로그인 페이지로 이동
+    navigate("/"); // 로그인 페이지로 이동
   };
 
   return (
@@ -61,7 +61,7 @@ const Navbar = () => {
         ) : (
           // userNick이 없으면 로그인 상태가 아니므로 로그인 버튼 표시
           <Link to="/login" style={{ textDecoration: "none" }}>
-            <button className="navbar__loginBtn" type="button" onClick={() => navigate("/login")}>
+            <button className="navbar__loginBtn" type="button" onClick={() => navigate("/")}>
               로그인
             </button>
           </Link>

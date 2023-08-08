@@ -17,7 +17,7 @@ function Home() {
   const [currentPage, setCurrentPage] = useState(0); // Added current page state
   useEffect(() => {
     if (!userInfo) {
-      navigate("/login");
+      navigate("/");
     }
   }, []);
   const fetchPosts = async (page) => {
@@ -56,7 +56,7 @@ function Home() {
   };
 
   return (
-    <div>
+    <div style={{ backgroundColor: "#f2f2f2", height: "100vh" }}>
       <Menu />
       <PostForm
         posts={posts}
@@ -65,17 +65,32 @@ function Home() {
         setHasMore={setHasMore}
         setCurrentPage={setCurrentPage}
       />
-      <PostList
-        posts={posts}
-        setPosts={setPosts}
-        isLoading={isLoading}
-        setIsLoading={setIsLoading}
-        hasMore={hasMore}
-        setHasMore={setHasMore}
-        setCurrentPage={setCurrentPage}
-        currentPage={currentPage}
-        fetchPosts={fetchPosts}
-      />
+      {posts.length === 0 ? (
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            justifyContent: "center",
+            alignItems: "center",
+            width: "100%",
+          }}
+        >
+          <h2>글이 없습니다.</h2>
+          <p>새로운 글을 작성해보세요!</p>
+        </div>
+      ) : (
+        <PostList
+          posts={posts}
+          setPosts={setPosts}
+          isLoading={isLoading}
+          setIsLoading={setIsLoading}
+          hasMore={hasMore}
+          setHasMore={setHasMore}
+          setCurrentPage={setCurrentPage}
+          currentPage={currentPage}
+          fetchPosts={fetchPosts}
+        />
+      )}
     </div>
   );
 }
