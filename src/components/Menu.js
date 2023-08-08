@@ -13,9 +13,10 @@ const Menu = () => {
 
   useEffect(() => {
     // 라우터의 주소에 따라서 선택된 메뉴를 변경합니다.
-    if (location.pathname === "/notification") {
-      setSelectedMenu("내가 쓴 글");
-    } else if (location.pathname === "/approval") {
+    // if (location.pathname === "/notification") {
+    //   setSelectedMenu("내가 쓴 글");
+    // } else
+    if (location.pathname === "/approval") {
       setSelectedMenu("승인");
     } else {
       setSelectedMenu("게시물");
@@ -38,7 +39,7 @@ const Menu = () => {
               게시물
             </li>
           </Link>
-          <Link to="/notification" style={{ textDecoration: "none" }}>
+          {/* <Link to="/notification" style={{ textDecoration: "none" }}>
             <li
               className={selectedMenu === "내가 쓴 글" ? "active" : ""}
               onClick={() => handleMenuClick("내가 쓴 글")}
@@ -48,7 +49,7 @@ const Menu = () => {
             >
               내가 쓴 글
             </li>
-          </Link>
+          </Link> */}
           {/* 사용자 역할이 1일 때만 "승인 대기" 메뉴를 표시합니다. */}
           {userInfo && userInfo.user_ROLE === 1 && (
             <Link to="/approval" style={{ textDecoration: "none" }}>
