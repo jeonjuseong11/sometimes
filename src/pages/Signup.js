@@ -14,7 +14,7 @@ const Signup = () => {
 
   useEffect(() => {
     if (userInfo) {
-      navigate("/");
+      navigate("/home");
     }
   }, [userInfo, navigate]);
   const handleSubmit = async (e) => {
@@ -31,7 +31,7 @@ const Signup = () => {
       );
       if (response.status === 200) {
         alert("회원가입 성공!");
-        navigate("/login");
+        navigate("/");
       } else {
         alert("회원가입 실패...");
       }
@@ -48,7 +48,7 @@ const Signup = () => {
       <div style={{ display: "flex" }}>
         <h1 style={{ margin: "0" }}>회원가입</h1>
         <Link
-          to="/"
+          to="/home"
           style={{
             textDecoration: "none",
             color: "black",

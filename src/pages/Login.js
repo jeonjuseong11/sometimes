@@ -58,7 +58,7 @@ const Login = () => {
     const userInfo = localStorage.getItem("userInfo");
     if (userInfo) {
       // userInfo가 있으면 로그인 상태로 간주하고 "/" 경로로 이동
-      navigate("/");
+      navigate("/home");
     }
   }, [navigate]);
   const handleSubmit = async (e) => {
@@ -76,7 +76,7 @@ const Login = () => {
       localStorage.setItem("userInfo", JSON.stringify(response.data));
       if (response.status === 200) {
         console.log("로그인 성공!");
-        navigate("/");
+        navigate("/home");
       } else {
         console.log("로그인 실패...");
         localStorage.removeItem("userInfo");
@@ -121,7 +121,7 @@ const Login = () => {
           <LoginBtn>회원가입</LoginBtn>
         </Link>
       </LoginEle>
-      <div
+      {/* <div
         style={{
           backgroundColor: "#FEE500",
           width: "60%",
@@ -131,7 +131,7 @@ const Login = () => {
         }}
       >
         <img src={KakaoImage} onClick={handleKakaoLogin} />
-      </div>
+      </div> */}
     </LoginWrapper>
   );
 };

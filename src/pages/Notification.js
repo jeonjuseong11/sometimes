@@ -10,7 +10,7 @@ const Notification = () => {
   const navigate = useNavigate();
   useEffect(() => {
     if (!userInfo) {
-      navigate("/login");
+      navigate("/");
     }
   }, []);
   const [posts, setPosts] = useState([]);
