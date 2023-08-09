@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components";
-import { Link, useNavigate } from "react-router-dom";
-import KakaoImage from "../assets/icons/kakao_login_medium_narrow.png";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import KakaoLogin from "../components/KakaoLogin";
 
@@ -40,27 +39,45 @@ export const LoginBtn = styled.button`
   border: 0;
   font-weight: 650;
 `;
-const KAKAO_LOGIN_API_URL = "https://kauth.kakao.com/oauth/authorize";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const location = useLocation();
 
-  const handleKakaoLogin = () => {
-    const clientId = "179adc4de9c40e8d6b2b1d4adc4b5451";
-    const redirectUri = "https://io065rlls1.execute-api.ap-northeast-2.amazonaws.com/"; // Redirect URI 설정 필요
-
-    const authUrl = `${KAKAO_LOGIN_API_URL}?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=code`;
-    window.location.href = authUrl;
-  };
   const navigate = useNavigate();
+
   useEffect(() => {
     const userInfo = localStorage.getItem("userInfo");
     if (userInfo) {
       // userInfo가 있으면 로그인 상태로 간주하고 "/" 경로로 이동
       navigate("/home");
     }
-  }, [navigate]);
+
+    const code = new URLSearchParams(location.search).get("code");
+    if (code) {
+      // 프론트엔드에서 받아온 코드를 백엔드에 전송하여 처리하는 로직
+      handleKakaoLogin(code);
+    }
+  }, [navigate, location]);
+
+  const handleKakaoLogin = async (code) => {
+    try {
+      // 백엔드로 code를 전송하여 카카오 API와 연동하여 사용자 정보를 받아옴
+      const response = await axios.post(
+        "http://localhost:8080/oauth/kakao", // 실제 백엔드의 API URL로 변경
+        { code }
+      );
+
+      // 받아온 사용자 정보를 로컬 스토리지에 저장하고 로그인 후 홈 화면으로 이동
+      localStorage.setItem("userInfo", JSON.stringify(response.data));
+      navigate("/home");
+    } catch (error) {
+      console.error("Error:", error);
+      alert("카카오 로그인에 실패했습니다. 다시 시도해주세요.");
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     const payload = {
@@ -92,9 +109,7 @@ const Login = () => {
 
   return (
     <LoginWrapper>
-      {/* <Link to="/" style={{ textDecoration: "none", color: "black" }}> */}
       <h1>썸타</h1>
-      {/* </Link> */}
       <LoginForm onSubmit={handleSubmit}>
         <LoginEle>
           <LoginEleInput
@@ -121,17 +136,9 @@ const Login = () => {
           <LoginBtn>회원가입</LoginBtn>
         </Link>
       </LoginEle>
-      {/* <div
-        style={{
-          backgroundColor: "#FEE500",
-          width: "60%",
-          borderRadius: "50px",
-          display: "flex",
-          justifyContent: "center",
-        }}
-      >
-        <img src={KakaoImage} onClick={handleKakaoLogin} />
-      </div> */}
+      <LoginEle>
+        <KakaoLogin />
+      </LoginEle>
     </LoginWrapper>
   );
 };
