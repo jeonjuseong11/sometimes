@@ -2,20 +2,63 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { FiMoreHorizontal } from "react-icons/fi";
 import DropdownMenu from "./DropdownMenu";
+import styled from "styled-components";
+
+const CommentContainer = styled.div`
+  position: relative;
+  margin-bottom: 1rem;
+`;
+
+const StyledTextarea = styled.textarea`
+  background-color: #f2f2f2;
+  border-radius: 10px;
+  padding: 1rem;
+  display: inline-block;
+  width: 100%;
+  margin-right: 0.5rem;
+  box-sizing: border-box;
+  resize: none;
+  border: 0;
+  outline: none;
+`;
+
+const StyledButton = styled.button`
+  background-color: transparent;
+  display: inline-block;
+`;
+
+const CommentContent = styled.div`
+  display: flex;
+  position: relative;
+`;
+
+const CommentContentWrapper = styled.div`
+  background-color: #f2f2f2;
+  border-radius: 10px;
+  padding: 1rem;
+  display: inline-block;
+`;
+
+const CommentActions = styled.div`
+  position: relative;
+  right: 0;
+  top: 0;
+  display: inline-block;
+`;
 
 const Comment = ({ comment, fetchComments, boardId }) => {
-  const [isEditing, setIsEditing] = useState(false); //댓글을 수정중인가
-  const [editedContent, setEditedContent] = useState(""); //수정중인 댓글
-  const [showMenu, setShowMenu] = useState(false); //수정 삭제 메뉴를 보이게 하는가
+  const [isEditing, setIsEditing] = useState(false);
+  const [editedContent, setEditedContent] = useState("");
+  const [showMenu, setShowMenu] = useState(false);
   const [showReplyInput, setShowReplyInput] = useState(false);
-  const [replyContent, setReplyContent] = useState(""); //답글 내용
-  const [isReplying, setIsReplying] = useState(false); //답글 입력창을 보이게 하는가
+  const [replyContent, setReplyContent] = useState("");
+  const [isReplying, setIsReplying] = useState(false);
 
   useEffect(() => {
     setEditedContent(comment.content);
   }, [comment]);
 
-  const apiUrl = "https://io065rlls1.execute-api.ap-northeast-2.amazonaws.com/comment"; //댓글 url 설정
+  const apiUrl = "https://io065rlls1.execute-api.ap-northeast-2.amazonaws.com/comment";
 
   const handleEditClick = () => {
     if (!isReplying) {
@@ -142,62 +185,31 @@ const Comment = ({ comment, fetchComments, boardId }) => {
     ));
   };
 
-  // Check if the comment is edited or if there is content for replying
   const isEdited = editedContent.trim() !== comment.content.trim();
   const isReplyNotEmpty = replyContent.trim() !== "";
 
   return (
-    <div style={{ position: "relative", marginBottom: "1rem" }}>
+    <CommentContainer>
       {isEditing ? (
         <div>
-          <textarea
-            style={{
-              backgroundColor: "#f2f2f2",
-              borderRadius: "10px",
-              padding: "1rem",
-              display: "inline-block",
-              width: "100%",
-              marginRight: "0.5rem",
-              boxSizing: "border-box",
-              resize: "none",
-              border: "0",
-              outline: "none",
-            }}
-            value={editedContent}
-            onChange={handleContentChange}
-          />
-          <button type="button" onClick={handleSaveEdit} disabled={!isEdited}>
+          <StyledTextarea value={editedContent} onChange={handleContentChange} />
+          <StyledButton type="button" onClick={handleSaveEdit} disabled={!isEdited}>
             저장
-          </button>
-          <button type="button" onClick={handleCancelEdit}>
+          </StyledButton>
+          <StyledButton type="button" onClick={handleCancelEdit}>
             취소
-          </button>
+          </StyledButton>
         </div>
       ) : (
-        <div style={{ display: "flex", position: "relative" }}>
-          <div
-            style={{
-              backgroundColor: "#f2f2f2",
-              borderRadius: "10px",
-              padding: "1rem",
-              display: "inline-block",
-            }}
-          >
+        <CommentContent>
+          <CommentContentWrapper>
             <p style={{ margin: "0" }}>{comment.userId}</p>
             <div>{displayContentWithLineBreaks(comment.content)}</div>
-          </div>
-          <div
-            style={{ position: "relative", right: 0, top: 0 }}
-            onMouseEnter={handleToggleMenu}
-            onMouseLeave={handleToggleMenu}
-          >
-            <button
-              type="button"
-              onClick={handleToggleMenu}
-              style={{ backgroundColor: "transparent", display: "inline-block" }}
-            >
+          </CommentContentWrapper>
+          <CommentActions onMouseEnter={handleToggleMenu} onMouseLeave={handleToggleMenu}>
+            <StyledButton type="button" onClick={handleToggleMenu}>
               <FiMoreHorizontal />
-            </button>
+            </StyledButton>
             {showMenu && (
               <DropdownMenu
                 onEdit={() => {
@@ -210,43 +222,30 @@ const Comment = ({ comment, fetchComments, boardId }) => {
                 }}
               />
             )}
-          </div>
-        </div>
+          </CommentActions>
+        </CommentContent>
       )}
 
       {showReplyInput && (
-        <div style={{ marginTop: "1rem", marginLeft: "2rem" }}>
-          <textarea
-            style={{
-              backgroundColor: "#f2f2f2",
-              borderRadius: "10px",
-              padding: "1rem",
-              width: "100%",
-              boxSizing: "border-box",
-              resize: "none",
-              border: "none",
-              outline: "none",
-            }}
-            value={replyContent}
-            onChange={handleReplyContentChange}
-          />
-          <button type="button" onClick={handleSaveReply} disabled={!isReplyNotEmpty}>
+        <div>
+          <StyledTextarea value={replyContent} onChange={handleReplyContentChange} />
+          <StyledButton type="button" onClick={handleSaveReply} disabled={!isReplyNotEmpty}>
             저장
-          </button>
-          <button type="button" onClick={handleCancelReply}>
+          </StyledButton>
+          <StyledButton type="button" onClick={handleCancelReply}>
             취소
-          </button>
+          </StyledButton>
         </div>
       )}
 
       {!isEditing && !showReplyInput && (
-        <button type="button" onClick={handleReplyClick}>
+        <StyledButton type="button" onClick={handleReplyClick}>
           답글
-        </button>
+        </StyledButton>
       )}
 
       {comment.children?.length > 0 && (
-        <div style={{ marginLeft: "2rem" }}>
+        <div>
           {comment.children.map((childComment) => (
             <Comment
               key={childComment.id}
@@ -257,7 +256,7 @@ const Comment = ({ comment, fetchComments, boardId }) => {
           ))}
         </div>
       )}
-    </div>
+    </CommentContainer>
   );
 };
 

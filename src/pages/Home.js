@@ -19,6 +19,7 @@ function Home() {
     if (!userInfo) {
       navigate("/");
     }
+    fetchPosts(0);
   }, []);
   const fetchPosts = async (page) => {
     try {
