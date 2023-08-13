@@ -24,7 +24,22 @@ const Navbar = () => {
     setUserNick(""); // 사용자 닉네임 상태 초기화
     navigate("/"); // 로그인 페이지로 이동
   };
+  const handleTestLogout = () => {
+    localStorage.clear(); // localStorage의 모든 데이터 제거
+    setUserNick(""); // 사용자 닉네임 상태 초기화
 
+    // 모든 쿠키를 삭제하는 로직 추가
+    const cookies = document.cookie.split("; ");
+    for (const cookie of cookies) {
+      const [name, _] = cookie.split("=");
+      document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
+      //만료 날짜 이후에 생성된 쿠키는 브라우저가 해당 쿠키를 자동으로 제거합니다
+      console.log(`Deleted cookie: ${name}`);
+    }
+
+    console.log("All cookies deleted.");
+    navigate("/"); // 로그인 페이지로 이동
+  };
   return (
     <nav
       className="navbar"
@@ -35,6 +50,9 @@ const Navbar = () => {
       <div className="navbar__links" style={{ position: "relative" }}>
         {userNick ? ( // userNick이 있으면 로그인 상태이므로 닉네임과 로그아웃 버튼 표시
           <div className="navbar__user-info ">
+            <button onClick={handleTestLogout} style={{ marginRight: "1rem" }}>
+              테스트 로그아웃 버튼
+            </button>
             <span className="navbar__userNick">{userNick}</span>
             {showMenu && (
               <div
@@ -60,8 +78,8 @@ const Navbar = () => {
           </div>
         ) : (
           // userNick이 없으면 로그인 상태가 아니므로 로그인 버튼 표시
-          <Link to="/login" style={{ textDecoration: "none" }}>
-            <button className="navbar__loginBtn" type="button" onClick={() => navigate("/")}>
+          <Link to="/" style={{ textDecoration: "none" }}>
+            <button className="navbar__loginBtn" type="button">
               로그인
             </button>
           </Link>
