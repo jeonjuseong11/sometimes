@@ -109,7 +109,7 @@ const Login = () => {
 
   return (
     <LoginWrapper>
-      <h1>썸타</h1>
+      <h1>스쿨메가폰</h1>
       <LoginForm onSubmit={handleSubmit}>
         <LoginEle>
           <LoginEleInput

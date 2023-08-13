@@ -46,7 +46,7 @@ const Navbar = () => {
       onMouseEnter={() => setShowMenu(true)}
       onMouseLeave={() => setShowMenu(false)}
     >
-      <div className="navbar__logo">썸타</div>
+      <div className="navbar__logo">스쿨메가폰</div>
       <div className="navbar__links" style={{ position: "relative" }}>
         {userNick ? ( // userNick이 있으면 로그인 상태이므로 닉네임과 로그아웃 버튼 표시
           <div className="navbar__user-info ">
