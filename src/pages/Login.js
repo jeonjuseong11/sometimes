@@ -65,7 +65,7 @@ const Login = () => {
     try {
       // 백엔드로 code를 전송하여 카카오 API와 연동하여 사용자 정보를 받아옴
       const response = await axios.post(
-        "http://localhost:8080/oauth/kakao", // 실제 백엔드의 API URL로 변경
+        "http://localhost:8002/oauth/kakao", // 실제 백엔드의 API URL로 변경
         { code }
       );
 
