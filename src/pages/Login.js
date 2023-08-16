@@ -14,26 +14,30 @@ export const LoginWrapper = styled.div`
   height: 100vh;
   box-sizing: border-box;
 `;
+
 export const LoginForm = styled.form`
   width: 60%;
-  margin-bottom: 1rem;
 `;
+
 export const LoginEle = styled.div`
   display: flex;
   justify-content: center;
   text-align: left;
   width: 100%;
-  margin-bottom: 1rem;
+  margin-top: 0.5rem;
 `;
+
 export const LoginEleInput = styled.input`
   padding: 1rem;
   width: 100%;
   border-radius: 50px;
-  border: 1px solid #d2d2d2;
+  border: 1px solid ${(props) => (props.hasError ? "red" : "#d2d2d2")};
   outline: none;
 `;
+
 export const LoginBtn = styled.button`
   padding: 0.8rem;
+  margin-top: 0.5rem;
   width: 100%;
   border-radius: 50px;
   border: 0;
@@ -44,33 +48,28 @@ const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const location = useLocation();
-
   const navigate = useNavigate();
 
   useEffect(() => {
     const userInfo = localStorage.getItem("userInfo");
     if (userInfo) {
-      // userInfo가 있으면 로그인 상태로 간주하고 "/" 경로로 이동
       navigate("/home");
     }
 
     const code = new URLSearchParams(location.search).get("code");
     if (code) {
-      // 프론트엔드에서 받아온 코드를 백엔드에 전송하여 처리하는 로직
       handleKakaoLogin(code);
     }
   }, [navigate, location]);
 
   const handleKakaoLogin = async (code) => {
     try {
-      // 백엔드로 code를 전송하여 카카오 API와 연동하여 사용자 정보를 받아옴
-      const response = await axios.post(
-        "http://localhost:8002/oauth/kakao", // 실제 백엔드의 API URL로 변경
-        { code }
-      );
+      const response = await axios.post(`http://localhost:8002/oauth/kakao?code=${code}`);
 
-      // 받아온 사용자 정보를 로컬 스토리지에 저장하고 로그인 후 홈 화면으로 이동
-      localStorage.setItem("userInfo", JSON.stringify(response.data));
+      const userData = response.data.data;
+      console.log(userData);
+      Object.freeze(userData); // userData 객체를 동결시킴
+      localStorage.setItem("userInfo", JSON.stringify(userData));
       navigate("/home");
     } catch (error) {
       console.error("Error:", error);
@@ -80,6 +79,12 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (!email || !password) {
+      alert("아이디와 비밀번호를 모두 입력해주세요.");
+      return;
+    }
+
     const payload = {
       uid: email,
       pass: password,
@@ -90,13 +95,15 @@ const Login = () => {
         "https://io065rlls1.execute-api.ap-northeast-2.amazonaws.com/api/user/login",
         payload
       );
-      localStorage.setItem("userInfo", JSON.stringify(response.data));
+
       if (response.status === 200) {
+        const userData = response.data;
+        Object.freeze(userData); // userData 객체를 동결시킴
+        localStorage.setItem("userInfo", JSON.stringify(userData));
         console.log("로그인 성공!");
         navigate("/home");
       } else {
         console.log("로그인 실패...");
-        localStorage.removeItem("userInfo");
       }
 
       setEmail("");
@@ -109,7 +116,7 @@ const Login = () => {
 
   return (
     <LoginWrapper>
-      <h1>썸타</h1>
+      <h1 style={{ margin: "0" }}>썸타</h1>
       <LoginForm onSubmit={handleSubmit}>
         <LoginEle>
           <LoginEleInput
@@ -131,11 +138,9 @@ const Login = () => {
         </LoginEle>
         <LoginBtn type="submit">로그인</LoginBtn>
       </LoginForm>
-      <LoginEle style={{ width: "60%" }}>
-        <Link to="/signup" style={{ width: "100%" }}>
-          <LoginBtn>회원가입</LoginBtn>
-        </Link>
-      </LoginEle>
+      <Link to="/signup" style={{ width: "60%" }}>
+        <LoginBtn>회원가입</LoginBtn>
+      </Link>
       <LoginEle>
         <KakaoLogin />
       </LoginEle>
