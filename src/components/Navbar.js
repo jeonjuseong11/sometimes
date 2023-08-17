@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import { decryptData } from "../utils/decrypyData";
 
 const Navbar = () => {
   const navigate = useNavigate();
@@ -19,12 +20,6 @@ const Navbar = () => {
       }
     }
   }, []);
-
-  // 복호화 함수
-  const decryptData = (encryptedData, key) => {
-    const decryptedData = decodeURIComponent(escape(atob(encryptedData))).replace(key, "");
-    return decryptedData;
-  };
 
   // 로그아웃 버튼을 클릭했을 때 처리하는 함수
   const handleLogout = () => {

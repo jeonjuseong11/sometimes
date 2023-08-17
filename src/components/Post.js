@@ -7,6 +7,7 @@ import "../styles.css";
 import DropdownMenu from "./DropdownMenu";
 import { PostFormTextArea } from "./PostForm";
 import axios from "axios";
+import { decryptData } from "../utils/decrypyData";
 
 const Post = ({ id, userName, title, content, category, fetchPosts, setPosts }) => {
   const [comments, setComments] = useState([]);
@@ -183,12 +184,6 @@ const Post = ({ id, userName, title, content, category, fetchPosts, setPosts }) 
   useEffect(() => {
     const encryptedUserInfo = localStorage.getItem("userInfo");
     const encryptionKey = process.env.REACT_APP_ENCRYPTION_KEY;
-
-    // 데이터 복호화 함수
-    const decryptData = (encryptedData, key) => {
-      const decryptedData = decodeURIComponent(escape(atob(encryptedData))).replace(key, "");
-      return decryptedData;
-    };
 
     if (encryptedUserInfo) {
       const decryptedUserInfo = decryptData(encryptedUserInfo, encryptionKey);

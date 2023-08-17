@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link, Outlet, useLocation } from "react-router-dom";
+import { decryptData } from "../utils/decrypyData";
 import Navbar from "./Navbar";
 
 const Menu = () => {
@@ -7,12 +8,6 @@ const Menu = () => {
   const location = useLocation();
   const encryptedUserInfo = localStorage.getItem("userInfo");
   const encryptionKey = process.env.REACT_APP_ENCRYPTION_KEY;
-
-  // 데이터 복호화 함수
-  const decryptData = (encryptedData, key) => {
-    const decryptedData = decodeURIComponent(escape(atob(encryptedData))).replace(key, "");
-    return decryptedData;
-  };
 
   // 복호화된 유저 정보를 가져오기 (null 또는 undefined일 경우를 처리)
   const decryptedUserInfo = encryptedUserInfo

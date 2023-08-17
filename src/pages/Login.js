@@ -44,11 +44,6 @@ export const LoginBtn = styled.button`
   font-weight: 650;
 `;
 
-export const decryptData = (encryptedData, key) => {
-  const decryptedData = decodeURIComponent(escape(atob(encryptedData))).replace(key, "");
-  return decryptedData;
-};
-
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");

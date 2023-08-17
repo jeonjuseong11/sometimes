@@ -8,6 +8,7 @@ import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import axios from "axios";
 import Approval from "./pages/Approval";
+import { decryptData } from "./utils/decrypyData";
 
 function App() {
   const encryptedUserInfo = localStorage.getItem("userInfo"); // 암호화된 유저 정보
@@ -15,12 +16,6 @@ function App() {
   useEffect(() => {
     if (encryptedUserInfo) {
       const encryptionKey = process.env.REACT_APP_ENCRYPTION_KEY;
-
-      // 데이터 복호화 함수
-      const decryptData = (encryptedData, key) => {
-        const decryptedData = decodeURIComponent(escape(atob(encryptedData))).replace(key, "");
-        return decryptedData;
-      };
 
       // 복호화된 유저 정보를 가져옴
       const decryptedUserInfo = decryptData(encryptedUserInfo, encryptionKey);

@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import styled from "styled-components";
 import axios from "axios";
+import { decryptData } from "../utils/decrypyData";
 
 const StyledPostForm = styled.form`
   padding: 1rem;
@@ -41,12 +42,6 @@ const PostForm = ({ posts, setPosts, setIsLoading, setHasMore, setCurrentPage })
   const [content, setContent] = useState("");
   const encryptedUserInfo = localStorage.getItem("userInfo");
   const encryptionKey = process.env.REACT_APP_ENCRYPTION_KEY;
-
-  // 데이터 복호화 함수
-  const decryptData = (encryptedData, key) => {
-    const decryptedData = decodeURIComponent(escape(atob(encryptedData))).replace(key, "");
-    return decryptedData;
-  };
 
   // 복호화된 유저 정보를 가져옴
   const decryptedUserInfo = decryptData(encryptedUserInfo, encryptionKey);

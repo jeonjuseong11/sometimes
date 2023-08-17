@@ -5,6 +5,7 @@ import PostList from "../components/PostList";
 import PostForm from "../components/PostForm";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { decryptData } from "../utils/decrypyData";
 
 function Home() {
   const navigate = useNavigate();
@@ -12,12 +13,6 @@ function Home() {
 
   // 암호화 키
   const encryptionKey = process.env.REACT_APP_ENCRYPTION_KEY;
-
-  // 데이터 복호화 함수
-  const decryptData = (encryptedData, key) => {
-    const decryptedData = decodeURIComponent(escape(atob(encryptedData))).replace(key, "");
-    return decryptedData;
-  };
 
   // 복호화된 유저 정보를 가져옴
   const decryptedUserInfo = decryptData(encryptedUserInfo, encryptionKey);
