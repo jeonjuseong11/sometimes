@@ -5,17 +5,27 @@ import Navbar from "./Navbar";
 const Menu = () => {
   const [selectedMenu, setSelectedMenu] = useState("게시물");
   const location = useLocation();
-  const userInfo = JSON.parse(localStorage.getItem("userInfo"));
+  const encryptedUserInfo = localStorage.getItem("userInfo");
+  const encryptionKey = process.env.REACT_APP_ENCRYPTION_KEY;
+
+  // 데이터 복호화 함수
+  const decryptData = (encryptedData, key) => {
+    const decryptedData = decodeURIComponent(escape(atob(encryptedData))).replace(key, "");
+    return decryptedData;
+  };
+
+  // 복호화된 유저 정보를 가져오기 (null 또는 undefined일 경우를 처리)
+  const decryptedUserInfo = encryptedUserInfo
+    ? decryptData(encryptedUserInfo, encryptionKey)
+    : null;
+
+  const userInfo = decryptedUserInfo ? JSON.parse(decryptedUserInfo) : null;
 
   const handleMenuClick = (menu) => {
     setSelectedMenu(menu);
   };
 
   useEffect(() => {
-    // 라우터의 주소에 따라서 선택된 메뉴를 변경합니다.
-    // if (location.pathname === "/notification") {
-    //   setSelectedMenu("내가 쓴 글");
-    // } else
     if (location.pathname === "/approval") {
       setSelectedMenu("승인");
     } else if (location.pathname === "/home") {
@@ -39,18 +49,6 @@ const Menu = () => {
               게시물
             </li>
           </Link>
-          {/* <Link to="/notification" style={{ textDecoration: "none" }}>
-            <li
-              className={selectedMenu === "내가 쓴 글" ? "active" : ""}
-              onClick={() => handleMenuClick("내가 쓴 글")}
-              style={{
-                color: selectedMenu === "내가 쓴 글" ? "#007bff" : "black",
-              }}
-            >
-              내가 쓴 글
-            </li>
-          </Link> */}
-          {/* 사용자 역할이 1일 때만 "승인 대기" 메뉴를 표시합니다. */}
           {userInfo && userInfo.user_ROLE === 1 && (
             <Link to="/approval" style={{ textDecoration: "none" }}>
               <li

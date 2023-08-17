@@ -3,7 +3,6 @@ import Post from "./Post";
 import axios from "axios";
 
 const PostList = ({ posts, setPosts, isLoading, hasMore, currentPage, fetchPosts }) => {
-  const userInfo = JSON.parse(localStorage.getItem("userInfo"));
   const observer = useRef();
   const lastPostRef = useRef();
 
@@ -43,7 +42,7 @@ const PostList = ({ posts, setPosts, isLoading, hasMore, currentPage, fetchPosts
     };
   }, [isLoading, hasMore, currentPage]);
   useEffect(() => {
-    console.log(posts);
+    // console.log(posts);
   }, [posts]);
   return (
     <div>

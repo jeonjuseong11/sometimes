@@ -1,5 +1,3 @@
-// Home.js
-
 import React, { useEffect, useState } from "react";
 import "../styles.css";
 import Menu from "../components/Menu";
@@ -10,17 +8,33 @@ import axios from "axios";
 
 function Home() {
   const navigate = useNavigate();
-  const userInfo = JSON.parse(localStorage.getItem("userInfo"));
+  const encryptedUserInfo = localStorage.getItem("userInfo"); // 암호화된 유저 정보
+
+  // 암호화 키
+  const encryptionKey = process.env.REACT_APP_ENCRYPTION_KEY;
+
+  // 데이터 복호화 함수
+  const decryptData = (encryptedData, key) => {
+    const decryptedData = decodeURIComponent(escape(atob(encryptedData))).replace(key, "");
+    return decryptedData;
+  };
+
+  // 복호화된 유저 정보를 가져옴
+  const decryptedUserInfo = decryptData(encryptedUserInfo, encryptionKey);
+  const userInfo = JSON.parse(decryptedUserInfo);
+
   const [posts, setPosts] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
-  const [currentPage, setCurrentPage] = useState(0); // Added current page state
+  const [currentPage, setCurrentPage] = useState(0);
+
   useEffect(() => {
     if (!userInfo) {
       navigate("/");
     }
     fetchPosts(0);
   }, []);
+
   const fetchPosts = async (page) => {
     try {
       setIsLoading(true);

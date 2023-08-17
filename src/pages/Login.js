@@ -44,6 +44,11 @@ export const LoginBtn = styled.button`
   font-weight: 650;
 `;
 
+export const decryptData = (encryptedData, key) => {
+  const decryptedData = decodeURIComponent(escape(atob(encryptedData))).replace(key, "");
+  return decryptedData;
+};
+
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -62,14 +67,20 @@ const Login = () => {
     }
   }, [navigate, location]);
 
+  const encryptionKey = process.env.REACT_APP_ENCRYPTION_KEY;
+
+  const encryptData = (data, key) => {
+    const encryptedData = btoa(unescape(encodeURIComponent(data + key)));
+    return encryptedData;
+  };
+
   const handleKakaoLogin = async (code) => {
     try {
       const response = await axios.post(`http://localhost:8002/oauth/kakao?code=${code}`);
 
       const userData = response.data.data;
-      console.log(userData);
-      Object.freeze(userData); // userData 객체를 동결시킴
-      localStorage.setItem("userInfo", JSON.stringify(userData));
+      const encryptedUserData = encryptData(JSON.stringify(userData), encryptionKey);
+      localStorage.setItem("userInfo", encryptedUserData);
       navigate("/home");
     } catch (error) {
       console.error("Error:", error);
@@ -98,8 +109,8 @@ const Login = () => {
 
       if (response.status === 200) {
         const userData = response.data;
-        Object.freeze(userData); // userData 객체를 동결시킴
-        localStorage.setItem("userInfo", JSON.stringify(userData));
+        const encryptedUserData = encryptData(JSON.stringify(userData), encryptionKey);
+        localStorage.setItem("userInfo", encryptedUserData);
         console.log("로그인 성공!");
         navigate("/home");
       } else {

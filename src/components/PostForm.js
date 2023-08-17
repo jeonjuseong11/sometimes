@@ -39,7 +39,18 @@ const SubmitButton = styled.button`
 
 const PostForm = ({ posts, setPosts, setIsLoading, setHasMore, setCurrentPage }) => {
   const [content, setContent] = useState("");
-  const userInfo = JSON.parse(localStorage.getItem("userInfo"));
+  const encryptedUserInfo = localStorage.getItem("userInfo");
+  const encryptionKey = process.env.REACT_APP_ENCRYPTION_KEY;
+
+  // 데이터 복호화 함수
+  const decryptData = (encryptedData, key) => {
+    const decryptedData = decodeURIComponent(escape(atob(encryptedData))).replace(key, "");
+    return decryptedData;
+  };
+
+  // 복호화된 유저 정보를 가져옴
+  const decryptedUserInfo = decryptData(encryptedUserInfo, encryptionKey);
+  const userInfo = JSON.parse(decryptedUserInfo);
 
   const fetchPosts = async () => {
     try {

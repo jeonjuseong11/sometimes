@@ -8,9 +8,11 @@ const Navbar = () => {
 
   // useEffect를 사용하여 페이지 로드 시 userInfo가 있는지 검사하여 처리
   useEffect(() => {
-    const userInfo = localStorage.getItem("userInfo");
-    if (userInfo) {
-      const parsedUserInfo = JSON.parse(userInfo);
+    const encryptedUserInfo = localStorage.getItem("userInfo");
+    const encryptionKey = process.env.REACT_APP_ENCRYPTION_KEY;
+    if (encryptedUserInfo) {
+      const decryptedUserInfo = decryptData(encryptedUserInfo, encryptionKey); // 암호화 키 사용
+      const parsedUserInfo = JSON.parse(decryptedUserInfo);
       if (parsedUserInfo.user_NICK) {
         // 사용자 닉네임이 있으면 로그인 상태로 간주하여 닉네임 표시
         setUserNick(parsedUserInfo.user_NICK);
@@ -18,28 +20,20 @@ const Navbar = () => {
     }
   }, []);
 
+  // 복호화 함수
+  const decryptData = (encryptedData, key) => {
+    const decryptedData = decodeURIComponent(escape(atob(encryptedData))).replace(key, "");
+    return decryptedData;
+  };
+
   // 로그아웃 버튼을 클릭했을 때 처리하는 함수
   const handleLogout = () => {
     localStorage.removeItem("userInfo"); // userInfo를 삭제하여 로그아웃 상태로 설정
     setUserNick(""); // 사용자 닉네임 상태 초기화
+    // 쿠키 삭제 로직...
     navigate("/"); // 로그인 페이지로 이동
   };
-  const handleTestLogout = () => {
-    localStorage.clear(); // localStorage의 모든 데이터 제거
-    setUserNick(""); // 사용자 닉네임 상태 초기화
 
-    // 모든 쿠키를 삭제하는 로직 추가
-    const cookies = document.cookie.split("; ");
-    for (const cookie of cookies) {
-      const [name, _] = cookie.split("=");
-      document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
-      //만료 날짜 이후에 생성된 쿠키는 브라우저가 해당 쿠키를 자동으로 제거합니다
-      console.log(`Deleted cookie: ${name}`);
-    }
-
-    console.log("All cookies deleted.");
-    navigate("/"); // 로그인 페이지로 이동
-  };
   return (
     <nav
       className="navbar"
@@ -50,9 +44,6 @@ const Navbar = () => {
       <div className="navbar__links" style={{ position: "relative" }}>
         {userNick ? ( // userNick이 있으면 로그인 상태이므로 닉네임과 로그아웃 버튼 표시
           <div className="navbar__user-info ">
-            <button onClick={handleTestLogout} style={{ marginRight: "1rem" }}>
-              테스트 로그아웃 버튼
-            </button>
             <span className="navbar__userNick">{userNick}</span>
             {showMenu && (
               <div

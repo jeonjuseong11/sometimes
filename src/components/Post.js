@@ -177,8 +177,31 @@ const Post = ({ id, userName, title, content, category, fetchPosts, setPosts }) 
     }
   };
 
+  // useEffect(() => {
+  //   setUserInfo(JSON.parse(localStorage.getItem("userInfo")));
+  // }, []);
   useEffect(() => {
-    setUserInfo(JSON.parse(localStorage.getItem("userInfo")));
+    const encryptedUserInfo = localStorage.getItem("userInfo");
+    const encryptionKey = process.env.REACT_APP_ENCRYPTION_KEY;
+
+    // 데이터 복호화 함수
+    const decryptData = (encryptedData, key) => {
+      const decryptedData = decodeURIComponent(escape(atob(encryptedData))).replace(key, "");
+      return decryptedData;
+    };
+
+    if (encryptedUserInfo) {
+      const decryptedUserInfo = decryptData(encryptedUserInfo, encryptionKey);
+      const parsedUserInfo = JSON.parse(decryptedUserInfo);
+      if (parsedUserInfo.user_NICK) {
+        // 사용자 닉네임이 있으면 로그인 상태로 간주하여 닉네임 표시
+        setUserInfo(parsedUserInfo);
+      } else {
+        setUserInfo(""); // 사용자 닉네임이 없으면 로그인 상태가 아님
+      }
+    } else {
+      setUserInfo(""); // 사용자 정보가 없으면 로그인 상태가 아님
+    }
   }, []);
 
   return (
