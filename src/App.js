@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import "./styles.css";
 import Home from "./pages/Home";
-import { Route, Routes } from "react-router-dom";
+import { Route, Routes, useNavigate } from "react-router-dom";
 import Menu from "./components/Menu";
 import Notification from "./pages/Notification";
 import Login from "./pages/Login";
@@ -12,9 +12,11 @@ import { decryptData } from "./utils/decrypyData";
 
 function App() {
   const encryptedUserInfo = localStorage.getItem("userInfo"); // 암호화된 유저 정보
-
+  const navigate = useNavigate();
   useEffect(() => {
-    if (encryptedUserInfo) {
+    if (!encryptedUserInfo) {
+      navigate("/");
+    } else {
       const encryptionKey = process.env.REACT_APP_ENCRYPTION_KEY;
 
       // 복호화된 유저 정보를 가져옴
@@ -22,8 +24,7 @@ function App() {
       const userInfo = JSON.parse(decryptedUserInfo);
       axios.defaults.headers.common["ACCESS_TOKEN"] = userInfo?.access_TOKEN;
     }
-  }, [encryptedUserInfo]);
-
+  }, [encryptedUserInfo, navigate]);
   return (
     <div className="app">
       <Routes>

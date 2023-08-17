@@ -1,3 +1,4 @@
+// Home.js
 import React, { useEffect, useState } from "react";
 import "../styles.css";
 import Menu from "../components/Menu";
@@ -9,12 +10,8 @@ import { decryptData } from "../utils/decrypyData";
 
 function Home() {
   const navigate = useNavigate();
-  const encryptedUserInfo = localStorage.getItem("userInfo"); // 암호화된 유저 정보
-
-  // 암호화 키
+  const encryptedUserInfo = localStorage.getItem("userInfo");
   const encryptionKey = process.env.REACT_APP_ENCRYPTION_KEY;
-
-  // 복호화된 유저 정보를 가져옴
   const decryptedUserInfo = decryptData(encryptedUserInfo, encryptionKey);
   const userInfo = JSON.parse(decryptedUserInfo);
 
@@ -26,12 +23,17 @@ function Home() {
   useEffect(() => {
     if (!userInfo) {
       navigate("/");
+      return;
     }
     fetchPosts(0);
-  }, []);
+  }, [navigate, userInfo]);
 
   const fetchPosts = async (page) => {
     try {
+      if (!hasMore) {
+        return; // 더 이상 불러올 게시물이 없으면 요청 중단
+      }
+
       setIsLoading(true);
       const response = await axios.get(
         `https://io065rlls1.execute-api.ap-northeast-2.amazonaws.com/board/pageList?page=${page}&size=5`,
@@ -54,6 +56,10 @@ function Home() {
           });
           setCurrentPage(page);
         }
+
+        if (response.data.data.last) {
+          setHasMore(false);
+        }
       } else {
         alert("게시글 불러오기 실패");
       }
@@ -74,33 +80,19 @@ function Home() {
         setIsLoading={setIsLoading}
         setHasMore={setHasMore}
         setCurrentPage={setCurrentPage}
+        fetchPosts={fetchPosts}
       />
-      {posts.length === 0 ? (
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "center",
-            alignItems: "center",
-            width: "100%",
-          }}
-        >
-          <h2>글이 없습니다.</h2>
-          <p>새로운 글을 작성해보세요!</p>
-        </div>
-      ) : (
-        <PostList
-          posts={posts}
-          setPosts={setPosts}
-          isLoading={isLoading}
-          setIsLoading={setIsLoading}
-          hasMore={hasMore}
-          setHasMore={setHasMore}
-          setCurrentPage={setCurrentPage}
-          currentPage={currentPage}
-          fetchPosts={fetchPosts}
-        />
-      )}
+      <PostList
+        posts={posts}
+        setPosts={setPosts}
+        isLoading={isLoading}
+        setIsLoading={setIsLoading}
+        hasMore={hasMore}
+        setHasMore={setHasMore}
+        setCurrentPage={setCurrentPage}
+        currentPage={currentPage}
+        fetchPosts={fetchPosts}
+      />
     </div>
   );
 }

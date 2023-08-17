@@ -1,17 +1,19 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Post from "./Post";
-import axios from "axios";
 
 const PostList = ({ posts, setPosts, isLoading, hasMore, currentPage, fetchPosts }) => {
   const observer = useRef();
   const lastPostRef = useRef();
+  const [loadingTimeout, setLoadingTimeout] = useState(null);
 
   useEffect(() => {
     fetchPosts(0);
   }, []);
 
   useEffect(() => {
-    if (isLoading) return;
+    if (isLoading || !hasMore || loadingTimeout !== null) {
+      return;
+    }
 
     const options = {
       root: null,
@@ -21,8 +23,13 @@ const PostList = ({ posts, setPosts, isLoading, hasMore, currentPage, fetchPosts
 
     const handleObserver = (entries) => {
       const target = entries[0];
-      if (target.isIntersecting && hasMore) {
-        fetchPosts(currentPage + 1);
+      if (target.isIntersecting) {
+        setLoadingTimeout(
+          setTimeout(() => {
+            fetchPosts(currentPage + 1);
+            setLoadingTimeout(null);
+          }, 10000)
+        );
       }
     };
 
@@ -39,11 +46,13 @@ const PostList = ({ posts, setPosts, isLoading, hasMore, currentPage, fetchPosts
       if (observer.current) {
         observer.current.disconnect();
       }
+      if (loadingTimeout !== null) {
+        clearTimeout(loadingTimeout);
+        setLoadingTimeout(null);
+      }
     };
-  }, [isLoading, hasMore, currentPage]);
-  useEffect(() => {
-    // console.log(posts);
-  }, [posts]);
+  }, [isLoading, hasMore, currentPage, loadingTimeout]);
+
   return (
     <div>
       {posts.map((post, index) => {
@@ -66,7 +75,8 @@ const PostList = ({ posts, setPosts, isLoading, hasMore, currentPage, fetchPosts
           );
         }
       })}
-      {isLoading && <div>Loading...</div>}
+      {isLoading && <div style={{ padding: "1rem", textAlign: "center" }}>Loading...</div>}
+      {!hasMore && <div style={{ padding: "1rem", textAlign: "center" }}>글의 끝입니다.</div>}
     </div>
   );
 };

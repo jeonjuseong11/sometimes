@@ -38,48 +38,13 @@ const SubmitButton = styled.button`
   cursor: ${(props) => (props.disabled ? "not-allowed" : "pointer")};
 `;
 
-const PostForm = ({ posts, setPosts, setIsLoading, setHasMore, setCurrentPage }) => {
+const PostForm = ({ posts, setPosts, setIsLoading, setHasMore, setCurrentPage, fetchPosts }) => {
   const [content, setContent] = useState("");
   const encryptedUserInfo = localStorage.getItem("userInfo");
   const encryptionKey = process.env.REACT_APP_ENCRYPTION_KEY;
 
-  // 복호화된 유저 정보를 가져옴
   const decryptedUserInfo = decryptData(encryptedUserInfo, encryptionKey);
   const userInfo = JSON.parse(decryptedUserInfo);
-
-  const fetchPosts = async () => {
-    try {
-      setIsLoading(true);
-      const response = await axios.get(
-        `https://io065rlls1.execute-api.ap-northeast-2.amazonaws.com/board/pageList?page=0&size=5`,
-        {
-          headers: {
-            ACCESS_TOKEN: userInfo.access_TOKEN,
-          },
-        }
-      );
-      if (response.status === 200) {
-        const newPosts = response.data.data.content;
-        if (newPosts.length === 0) {
-          setHasMore(false);
-        } else {
-          // Check for duplicates and add only new posts
-          setPosts((prevPosts) => {
-            const postIds = prevPosts.map((post) => post.id);
-            const filteredPosts = newPosts.filter((post) => !postIds.includes(post.id));
-            return [...filteredPosts, ...prevPosts];
-          });
-        }
-      } else {
-        alert("게시글 불러오기 실패");
-      }
-    } catch (error) {
-      console.error("게시글 가져오기 에러:", error);
-      alert("게시글 불러오기 실패");
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -115,6 +80,7 @@ const PostForm = ({ posts, setPosts, setIsLoading, setHasMore, setCurrentPage })
       alert("게시물 작성에 실패하였습니다.");
     }
     setContent("");
+    setIsLoading(false);
   };
 
   return (
