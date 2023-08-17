@@ -8,7 +8,7 @@ import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import axios from "axios";
 import Approval from "./pages/Approval";
-import { decryptData } from "./utils/decrypyData";
+import { decryptData } from "./utils/decryptData";
 
 function App() {
   const encryptedUserInfo = localStorage.getItem("userInfo"); // 암호화된 유저 정보

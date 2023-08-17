@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import styled from "styled-components";
 import axios from "axios";
-import { decryptData } from "../utils/decrypyData";
+import { decryptData } from "../utils/decryptData";
 
 const StyledPostForm = styled.form`
   padding: 1rem;

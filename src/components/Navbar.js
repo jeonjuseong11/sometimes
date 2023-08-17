@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import { decryptData } from "../utils/decrypyData";
+import { decryptData } from "../utils/decryptData";
 
 const Navbar = () => {
   const navigate = useNavigate();

@@ -7,7 +7,7 @@ import "../styles.css";
 import DropdownMenu from "./DropdownMenu";
 import { PostFormTextArea } from "./PostForm";
 import axios from "axios";
-import { decryptData } from "../utils/decrypyData";
+import { decryptData } from "../utils/decryptData";
 
 const Post = ({ id, userName, title, content, category, fetchPosts, setPosts }) => {
   const [comments, setComments] = useState([]);

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link, Outlet, useLocation } from "react-router-dom";
-import { decryptData } from "../utils/decrypyData";
+import { decryptData } from "../utils/decryptData";
 import Navbar from "./Navbar";
 
 const Menu = () => {

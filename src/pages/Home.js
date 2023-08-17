@@ -6,7 +6,7 @@ import PostList from "../components/PostList";
 import PostForm from "../components/PostForm";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { decryptData } from "../utils/decrypyData";
+import { decryptData } from "../utils/decryptData";
 
 function Home() {
   const navigate = useNavigate();
