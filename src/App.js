@@ -29,6 +29,7 @@ function App() {
     <div className="app">
       <Routes>
         <Route exact path="/" element={<Login />} />
+        {/* <Route exact path="/oauth/kakao" element={<Login />} /> */}
         <Route exact path="/home" element={<Home />} />
         <Route exact path="/signup" element={<Signup />} />
         <Route element={<Menu />}>
