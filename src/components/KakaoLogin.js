@@ -1,5 +1,4 @@
 import React from "react";
-import axios from "axios";
 
 const KakaoLogin = () => {
   const CLIENT_ID = process.env.REACT_APP_CLIENT_ID;
@@ -13,7 +12,6 @@ const KakaoLogin = () => {
       window.location.href = kakaoURL;
     } catch (error) {
       console.error("Error:", error);
-      alert("카카오 로그인에 실패했습니다. 다시 시도해주세요.");
     }
   };
 

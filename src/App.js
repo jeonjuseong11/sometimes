@@ -9,6 +9,7 @@ import Signup from "./pages/Signup";
 import axios from "axios";
 import Approval from "./pages/Approval";
 import { decryptData } from "./utils/decryptData";
+import KakaoCallback from "./components/KakaoCallback";
 
 function App() {
   const encryptedUserInfo = localStorage.getItem("userInfo"); // 암호화된 유저 정보
@@ -32,6 +33,7 @@ function App() {
         {/* <Route exact path="/oauth/kakao" element={<Login />} /> */}
         <Route exact path="/home" element={<Home />} />
         <Route exact path="/signup" element={<Signup />} />
+        <Route exact path="/oauth/kakao" element={<KakaoCallback />} />
         <Route element={<Menu />}>
           <Route exact path="/notification" element={<Notification />} />
           <Route exact path="/approval" element={<Approval />} />

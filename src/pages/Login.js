@@ -55,11 +55,6 @@ const Login = () => {
     if (userInfo) {
       navigate("/home");
     }
-
-    const code = new URLSearchParams(location.search).get("code");
-    if (code) {
-      handleKakaoLogin(code);
-    }
   }, [navigate, location]);
 
   const encryptionKey = process.env.REACT_APP_ENCRYPTION_KEY;
@@ -67,20 +62,6 @@ const Login = () => {
   const encryptData = (data, key) => {
     const encryptedData = btoa(unescape(encodeURIComponent(data + key)));
     return encryptedData;
-  };
-
-  const handleKakaoLogin = async (code) => {
-    try {
-      const response = await axios.post(`http://localhost:8002/oauth/kakao?code=${code}`);
-
-      const userData = response.data.data;
-      const encryptedUserData = encryptData(JSON.stringify(userData), encryptionKey);
-      localStorage.setItem("userInfo", encryptedUserData);
-      navigate("/home");
-    } catch (error) {
-      console.error("Error:", error);
-      alert("카카오 로그인에 실패했습니다. 다시 시도해주세요.");
-    }
   };
 
   const handleSubmit = async (e) => {
