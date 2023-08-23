@@ -61,7 +61,7 @@ const PostForm = ({ posts, setPosts, setIsLoading, setHasMore, setCurrentPage, f
 
     try {
       const response = await axios.post(
-        `https://io065rlls1.execute-api.ap-northeast-2.amazonaws.com/board/create?content=${newEntry.content}`,
+        `http://localhost:8002/board/create?content=${newEntry.content}`,
         newEntry,
         {
           headers: {

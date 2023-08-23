@@ -55,7 +55,7 @@ const ApprovalPost = ({ userName, id, content, fetchData }) => {
   const acceptPost = async (state) => {
     try {
       const response = await axios.put(
-        `https://io065rlls1.execute-api.ap-northeast-2.amazonaws.com/board/changeState/${id}?state=${state}`,
+        `http://localhost:8002/board/changeState/${id}?state=${state}`,
         null,
         {
           headers: {
