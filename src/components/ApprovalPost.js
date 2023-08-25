@@ -3,6 +3,7 @@ import axios from "axios";
 import { BsCheckLg } from "react-icons/bs";
 import { ImCancelCircle } from "react-icons/im";
 import styled from "styled-components";
+import { decryptData } from "../utils/decryptData"; // decryptData import 추가
 
 const Container = styled.div`
   padding: 1rem;
@@ -50,12 +51,12 @@ const RejectButton = styled(ApprovalButton)`
 `;
 
 const ApprovalPost = ({ userName, id, content, fetchData }) => {
-  const userInfo = JSON.parse(localStorage.getItem("userInfo"));
+  const userInfo = JSON.parse(decryptData(localStorage.getItem("userInfo"))); // decryptData 적용
   const [state, setState] = useState();
   const acceptPost = async (state) => {
     try {
       const response = await axios.put(
-        `https://io065rlls1.execute-api.ap-northeast-2.amazonaws.com/board/changeState/${id}?state=${state}`,
+        `http://localhost:8002/board/changeState/${id}?state=${state}`,
         null,
         {
           headers: {
