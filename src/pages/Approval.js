@@ -3,25 +3,32 @@ import "../styles.css";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import ApprovalList from "../components/ApprovalList";
+import { decryptData } from "../utils/decryptData";
 
 const Approval = () => {
-  const userInfo = localStorage.getItem("userInfo");
   const navigate = useNavigate();
-  useEffect(() => {
-    if (!userInfo) {
-      navigate("/");
-    }
-  }, []);
   const [posts, setPosts] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState(false);
-  const fetchData = async () => {
-    const userInfo = JSON.parse(localStorage.getItem("userInfo"));
 
+  useEffect(() => {
+    const encryptedUserInfo = localStorage.getItem("userInfo");
+    const encryptionKey = process.env.REACT_APP_ENCRYPTION_KEY;
+    const decryptedUserInfo = decryptData(encryptedUserInfo, encryptionKey);
+    const userInfo = JSON.parse(decryptedUserInfo);
+
+    if (!userInfo) {
+      navigate("/");
+    } else {
+      fetchData(userInfo.access_TOKEN);
+    }
+  }, []);
+
+  const fetchData = async (accessToken) => {
     try {
-      const response = await axios.get(`http://localhost:8002/board/list/0`, {
+      const response = await axios.get("http://localhost:8002/board/list/0", {
         headers: {
-          ACCESS_TOKEN: userInfo.access_TOKEN,
+          ACCESS_TOKEN: accessToken,
         },
       });
 
@@ -29,19 +36,16 @@ const Approval = () => {
         setPosts(response.data.data);
         setIsLoading(false);
       } else {
-        console.error("Failed to fetch posts.");
+        console.error("게시글 로딩 실패");
         setIsLoading(false);
         setIsError(true);
       }
     } catch (error) {
-      console.error("Error occurred while fetching posts:", error);
+      console.error("Error:", error);
       setIsLoading(false);
       setIsError(true);
     }
   };
-  useEffect(() => {
-    fetchData();
-  }, []);
 
   return (
     <div className="Approval" style={{ margin: "0", backgroundColor: "#f2f2f2" }}>
