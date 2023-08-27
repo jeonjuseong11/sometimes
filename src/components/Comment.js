@@ -58,7 +58,7 @@ const Comment = ({ comment, fetchComments, boardId }) => {
     setEditedContent(comment.content);
   }, [comment]);
 
-  const apiUrl = "http://localhost:8002/comment";
+  const apiUrl = "https://io065rlls1.execute-api.ap-northeast-2.amazonaws.com/comment";
 
   const handleEditClick = () => {
     if (!isReplying) {

@@ -78,7 +78,10 @@ const Login = () => {
     };
 
     try {
-      const response = await axios.post("http://localhost:8002/api/user/login", payload);
+      const response = await axios.post(
+        "https://io065rlls1.execute-api.ap-northeast-2.amazonaws.com/api/user/login",
+        payload
+      );
 
       if (response.status === 200) {
         const userData = response.data;

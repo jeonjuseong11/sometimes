@@ -27,7 +27,7 @@ export const PostProvider = ({ children }) => {
         const userInfo = JSON.parse(decryptedUserInfo);
 
         const response = await axios.get(
-          `http://localhost:8002/board/pageList?page=${page}&size=5`,
+          `https://io065rlls1.execute-api.ap-northeast-2.amazonaws.com/board/pageList?page=${page}&size=5`,
           {
             headers: {
               ACCESS_TOKEN: userInfo.access_TOKEN,

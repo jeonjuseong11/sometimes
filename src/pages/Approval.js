@@ -26,11 +26,14 @@ const Approval = () => {
 
   const fetchData = async (accessToken) => {
     try {
-      const response = await axios.get("http://localhost:8002/board/list/0", {
-        headers: {
-          ACCESS_TOKEN: accessToken,
-        },
-      });
+      const response = await axios.get(
+        "https://io065rlls1.execute-api.ap-northeast-2.amazonaws.com/board/list/0",
+        {
+          headers: {
+            ACCESS_TOKEN: accessToken,
+          },
+        }
+      );
 
       if (response.status === 200) {
         setPosts(response.data.data);

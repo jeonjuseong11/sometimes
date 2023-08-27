@@ -21,7 +21,9 @@ const KakaoCallback = () => {
 
   const handleKakaoLogin = async (code) => {
     try {
-      const response = await axios.post(`http://localhost:8002/oauth/kakao?code=${code}`);
+      const response = await axios.post(
+        `https://io065rlls1.execute-api.ap-northeast-2.amazonaws.com/oauth/kakao?code=${code}`
+      );
 
       const userData = response.data.data;
       const encryptionKey = process.env.REACT_APP_ENCRYPTION_KEY;

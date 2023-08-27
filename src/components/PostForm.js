@@ -61,11 +61,15 @@ const PostForm = () => {
         content: content,
       };
 
-      const response = await axios.post("http://localhost:8002/board/create", newEntry, {
-        headers: {
-          ACCESS_TOKEN: userInfo.access_TOKEN,
-        },
-      });
+      const response = await axios.post(
+        "https://io065rlls1.execute-api.ap-northeast-2.amazonaws.com/board/create",
+        newEntry,
+        {
+          headers: {
+            ACCESS_TOKEN: userInfo.access_TOKEN,
+          },
+        }
+      );
 
       if (response.data.success) {
         alert("게시물이 성공적으로 작성되었습니다.");

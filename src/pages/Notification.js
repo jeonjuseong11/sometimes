@@ -20,11 +20,14 @@ const Notification = () => {
     const userInfo = JSON.parse(localStorage.getItem("userInfo"));
 
     try {
-      const response = await axios.get(`http://localhost:8002/board/list/${userInfo.school_NO}`, {
-        headers: {
-          ACCESS_TOKEN: userInfo.access_TOKEN,
-        },
-      });
+      const response = await axios.get(
+        `https://io065rlls1.execute-api.ap-northeast-2.amazonaws.com/board/list/${userInfo.school_NO}`,
+        {
+          headers: {
+            ACCESS_TOKEN: userInfo.access_TOKEN,
+          },
+        }
+      );
 
       if (response.status === 200) {
         setPosts(response.data.data);
