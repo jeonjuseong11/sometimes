@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import styled from "styled-components";
 import axios from "axios";
 import { decryptData } from "../utils/decryptData";
+import { usePostContext } from "../contexts/PostContext";
 
 const StyledPostForm = styled.form`
   padding: 1rem;
@@ -38,13 +39,9 @@ const SubmitButton = styled.button`
   cursor: ${(props) => (props.disabled ? "not-allowed" : "pointer")};
 `;
 
-const PostForm = ({ posts, setPosts, setIsLoading, setHasMore, setCurrentPage, fetchPosts }) => {
+const PostForm = () => {
+  const { fetchPosts, currentPage } = usePostContext();
   const [content, setContent] = useState("");
-  const encryptedUserInfo = localStorage.getItem("userInfo");
-  const encryptionKey = process.env.REACT_APP_ENCRYPTION_KEY;
-
-  const decryptedUserInfo = decryptData(encryptedUserInfo, encryptionKey);
-  const userInfo = JSON.parse(decryptedUserInfo);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -54,24 +51,26 @@ const PostForm = ({ posts, setPosts, setIsLoading, setHasMore, setCurrentPage, f
       return;
     }
 
-    const newEntry = {
-      id: 1,
-      content: content,
-    };
-
     try {
-      const response = await axios.post(
-        `https://io065rlls1.execute-api.ap-northeast-2.amazonaws.com/board/create?content=${newEntry.content}`,
-        newEntry,
-        {
-          headers: {
-            ACCESS_TOKEN: userInfo.access_TOKEN,
-          },
-        }
-      );
+      const encryptedUserInfo = localStorage.getItem("userInfo");
+      const encryptionKey = process.env.REACT_APP_ENCRYPTION_KEY;
+      const decryptedUserInfo = decryptData(encryptedUserInfo, encryptionKey);
+      const userInfo = JSON.parse(decryptedUserInfo);
+
+      const newEntry = {
+        content: content,
+      };
+
+      const response = await axios.post("http://localhost:8002/board/create", newEntry, {
+        headers: {
+          ACCESS_TOKEN: userInfo.access_TOKEN,
+        },
+      });
+
       if (response.data.success) {
         alert("게시물이 성공적으로 작성되었습니다.");
-        fetchPosts();
+        fetchPosts(currentPage);
+        setContent("");
       } else {
         alert("게시물 작성에 실패하였습니다.");
       }
@@ -79,21 +78,13 @@ const PostForm = ({ posts, setPosts, setIsLoading, setHasMore, setCurrentPage, f
       console.error("Error occurred while posting the data:", error);
       alert("게시물 작성에 실패하였습니다.");
     }
-    setContent("");
-    setIsLoading(false);
   };
 
   return (
-    <div
-      style={{
-        backgroundColor: "#f2f2f2",
-        padding: "1rem",
-      }}
-    >
+    <div style={{ backgroundColor: "#f2f2f2", padding: "1rem" }}>
       <StyledPostForm onSubmit={handleSubmit}>
         <PostFormTextArea
           placeholder="무슨 생각을 하고 계신가요?"
-          id="content"
           value={content}
           onChange={(e) => setContent(e.target.value)}
           required
