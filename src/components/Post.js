@@ -9,7 +9,7 @@ import { PostFormTextArea } from "./PostForm";
 import axios from "axios";
 import { decryptData } from "../utils/decryptData";
 
-const Post = ({ id, userName, title, content, category, fetchPosts, setPosts }) => {
+const Post = ({ id, userName, title, content, category, fetchPosts, setPosts, currentPage }) => {
   const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState("");
   const [showAllComments, setShowAllComments] = useState(false);
@@ -137,7 +137,7 @@ const Post = ({ id, userName, title, content, category, fetchPosts, setPosts }) 
           prevPosts.filter((post) => post.id === id && post.content === editedContent)
         );
         alert("게시글이 성공적으로 수정되었습니다.");
-        fetchPosts(0); // 게시글 목록을 갱신
+        fetchPosts(currentPage); // 게시글 목록을 갱신
         setEditing(false);
       } else {
         alert("게시글 수정에 실패하였습니다.");
@@ -161,7 +161,7 @@ const Post = ({ id, userName, title, content, category, fetchPosts, setPosts }) 
         if (response.status === 200) {
           setPosts((prevPosts) => prevPosts.filter((post) => post.id !== id)); // 상태에서 해당 게시물을 제거
           alert("게시글이 성공적으로 삭제되었습니다.");
-          fetchPosts(0); // 게시글 목록을 갱신
+          fetchPosts(currentPage); // 게시글 목록을 갱신
         } else {
           alert("게시글 삭제에 실패하였습니다.");
         }
