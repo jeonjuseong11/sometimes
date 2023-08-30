@@ -103,7 +103,7 @@ const Login = () => {
 
   return (
     <LoginWrapper>
-      <h1 style={{ margin: "0" }}>썸타</h1>
+      <h1 style={{ margin: "0" }}>스쿨메가폰</h1>
       <LoginForm onSubmit={handleSubmit}>
         <LoginEle>
           <LoginEleInput
