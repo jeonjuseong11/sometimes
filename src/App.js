@@ -13,20 +13,25 @@ import KakaoCallback from "./components/KakaoCallback";
 import { PostProvider } from "./contexts/PostContext";
 
 function App() {
-  const encryptedUserInfo = localStorage.getItem("userInfo"); // 암호화된 유저 정보
+  const encryptedUserInfo = localStorage.getItem("userInfo");
   const navigate = useNavigate();
-  useEffect(() => {
-    if (!encryptedUserInfo) {
-      navigate("/");
-    } else {
-      const encryptionKey = process.env.REACT_APP_ENCRYPTION_KEY;
 
-      // 복호화된 유저 정보를 가져옴
-      const decryptedUserInfo = decryptData(encryptedUserInfo, encryptionKey);
-      const userInfo = JSON.parse(decryptedUserInfo);
-      axios.defaults.headers.common["ACCESS_TOKEN"] = userInfo?.access_TOKEN;
-    }
+  useEffect(() => {
+    const handleNavigation = async () => {
+      if (!encryptedUserInfo) {
+        navigate("/");
+      } else {
+        const encryptionKey = process.env.REACT_APP_ENCRYPTION_KEY;
+        const decryptedUserInfo = decryptData(encryptedUserInfo, encryptionKey);
+        const userInfo = JSON.parse(decryptedUserInfo);
+        axios.defaults.headers.common["ACCESS_TOKEN"] = userInfo?.access_TOKEN;
+        navigate("/home");
+      }
+    };
+
+    handleNavigation();
   }, [encryptedUserInfo, navigate]);
+
   return (
     <div className="app">
       <PostProvider>

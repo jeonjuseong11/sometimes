@@ -23,10 +23,15 @@ const Navbar = () => {
 
   // 로그아웃 버튼을 클릭했을 때 처리하는 함수
   const handleLogout = () => {
-    localStorage.removeItem("userInfo"); // userInfo를 삭제하여 로그아웃 상태로 설정
-    setUserNick(""); // 사용자 닉네임 상태 초기화
+    localStorage.removeItem("userInfo");
     // 쿠키 삭제 로직...
-    navigate("/"); // 로그인 페이지로 이동
+    document.cookie.split(";").forEach((cookie) => {
+      document.cookie = cookie
+        .replace(/^ +/, "")
+        .replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
+    });
+    setUserNick("");
+    navigate("/");
   };
 
   return (

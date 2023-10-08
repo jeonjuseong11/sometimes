@@ -34,6 +34,7 @@ const Post = ({ id, userName, title, content, category, fetchPosts, setPosts, cu
     try {
       const response = await axios.get(
         `https://io065rlls1.execute-api.ap-northeast-2.amazonaws.com/comment/list?boardId=${id}`
+        // `http://localhost:8002/comment/list?boardId=${id}`
       );
       if (response.data.success) {
         setComments(response.data.data);

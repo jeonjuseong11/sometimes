@@ -1,11 +1,12 @@
 import React from "react";
 
 const KakaoLogin = () => {
+  const KAKAO_AUTH_URL = "https://kauth.kakao.com/oauth/authorize";
   const CLIENT_ID = process.env.REACT_APP_CLIENT_ID;
   const REDIRECT_URI = process.env.REACT_APP_REDIRECT_URI;
 
   const handleKakaoLoginClick = async () => {
-    const kakaoURL = `https://kauth.kakao.com/oauth/authorize?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=code`;
+    const kakaoURL = `${KAKAO_AUTH_URL}?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=code`;
 
     try {
       // 로그인 버튼을 클릭하여 카카오 인증 화면으로 이동

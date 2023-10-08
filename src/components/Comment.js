@@ -59,7 +59,7 @@ const Comment = ({ comment, fetchComments, boardId }) => {
   }, [comment]);
 
   const apiUrl = "https://io065rlls1.execute-api.ap-northeast-2.amazonaws.com/comment";
-
+  // const apiUrl = " http://localhost:8002/comment";
   const handleEditClick = () => {
     if (!isReplying) {
       setIsEditing(true);
@@ -203,7 +203,7 @@ const Comment = ({ comment, fetchComments, boardId }) => {
       ) : (
         <CommentContent>
           <CommentContentWrapper>
-            <p style={{ margin: "0" }}>{comment.userId}</p>
+            <p style={{ margin: "0" }}>{comment.nickname}</p>
             <div>{displayContentWithLineBreaks(comment.content)}</div>
           </CommentContentWrapper>
           <CommentActions onMouseEnter={handleToggleMenu} onMouseLeave={handleToggleMenu}>
