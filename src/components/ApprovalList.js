@@ -41,7 +41,7 @@ const ApprovalList = ({ posts, isLoading, isError, fetchData }) => {
   // 만약 필터링된 포스트가 없다면 글이 없다는 메시지를 표시합니다.
   if (filteredPosts?.length === 0) {
     return (
-      <PostContainer>
+      <PostContainer style={{ height: "85vh" }}>
         <h2>글이 없습니다.</h2>
       </PostContainer>
     );

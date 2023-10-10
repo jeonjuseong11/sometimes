@@ -29,13 +29,11 @@ const Post = ({ id, userName, title, content, category, fetchPosts, setPosts, cu
       fetchComments();
     }
   };
-
+  const apiUrl = "https://io065rlls1.execute-api.ap-northeast-2.amazonaws.com";
+  // const apiUrl = " http://localhost:8002";
   const fetchComments = async () => {
     try {
-      const response = await axios.get(
-        `https://io065rlls1.execute-api.ap-northeast-2.amazonaws.com/comment/list?boardId=${id}`
-        // `http://localhost:8002/comment/list?boardId=${id}`
-      );
+      const response = await axios.get(`${apiUrl}/comment/list?boardId=${id}`);
       if (response.data.success) {
         setComments(response.data.data);
         setCommentsLoaded(true);
@@ -57,7 +55,7 @@ const Post = ({ id, userName, title, content, category, fetchPosts, setPosts, cu
         setNewComment("");
 
         const response = await axios.post(
-          `https://io065rlls1.execute-api.ap-northeast-2.amazonaws.com/comment?boardId=${id}&content=${newComment}`,
+          `${apiUrl}/comment?boardId=${id}&content=${newComment}`,
           null,
           {
             headers: {
@@ -72,6 +70,7 @@ const Post = ({ id, userName, title, content, category, fetchPosts, setPosts, cu
           setCommentsLoaded(true);
           setInputFocused(false);
           setShowComment(true); // 댓글을 추가하고 댓글 창을 보여줌
+          setNewComment("");
 
           inputRef.current.blur();
         } else {
@@ -122,7 +121,7 @@ const Post = ({ id, userName, title, content, category, fetchPosts, setPosts, cu
 
     try {
       const response = await axios.put(
-        `https://io065rlls1.execute-api.ap-northeast-2.amazonaws.com/board/update?id=${id}&content=${editedContent}`,
+        `${apiUrl}/board/update?id=${id}&content=${editedContent}`,
         {
           title: title,
           content: editedContent,
@@ -134,13 +133,12 @@ const Post = ({ id, userName, title, content, category, fetchPosts, setPosts, cu
           },
         }
       );
-
-      if (response.data.success) {
+      if (response.data.success === true) {
         setPosts((prevPosts) =>
-          prevPosts.filter((post) => post.id === id && post.content === editedContent)
+          prevPosts.map((post) => (post.id === id ? { ...post, content: editedContent } : post))
         );
+        fetchPosts(currentPage);
         alert("게시글이 성공적으로 수정되었습니다.");
-        fetchPosts(currentPage); // 게시글 목록을 갱신
         setEditing(false);
       } else {
         alert("게시글 수정에 실패하였습니다.");
@@ -155,22 +153,16 @@ const Post = ({ id, userName, title, content, category, fetchPosts, setPosts, cu
     const shouldDelete = window.confirm("정말로 이 게시글을 삭제하시겠습니까?");
     if (shouldDelete) {
       try {
-        const response = await axios.put(
-          `https://io065rlls1.execute-api.ap-northeast-2.amazonaws.com/board/delete?id=${id}`,
-          null,
-          {
-            headers: {
-              ACCESS_TOKEN: userInfo.access_TOKEN,
-            },
-          }
-        );
+        const response = await axios.put(`${apiUrl}/board/delete?id=${id}`, null, {
+          headers: {
+            ACCESS_TOKEN: userInfo.access_TOKEN,
+          },
+        });
 
-        if (response.status === 200) {
-          setPosts((prevPosts) => prevPosts.filter((post) => post.id !== id)); // 상태에서 해당 게시물을 제거
+        if (response.data.success) {
           alert("게시글이 성공적으로 삭제되었습니다.");
+          setPosts((prevPosts) => prevPosts.filter((post) => post.id !== id)); // 상태에서 해당 게시물을 제거
           fetchPosts(currentPage); // 게시글 목록을 갱신
-        } else {
-          alert("게시글 삭제에 실패하였습니다.");
         }
       } catch (error) {
         console.error("Error occurred while deleting the post:", error);
@@ -231,16 +223,18 @@ const Post = ({ id, userName, title, content, category, fetchPosts, setPosts, cu
               <p style={{ margin: "0 0 1rem" }}>{userName}</p>
               <p style={{ margin: "0", fontSize: "1rem" }}>{content}</p>
             </div>
-            <div
-              onMouseEnter={() => setShowMenu(true)}
-              onMouseLeave={() => setShowMenu(false)}
-              style={{ position: "absolute", right: 5, top: 5 }}
-            >
-              <button onClick={() => setShowMenu((prev) => !prev)}>
-                <FiMoreHorizontal />
-              </button>
-              {showMenu && <DropdownMenu onEdit={handleEdit} onDelete={handleDelete} />}
-            </div>
+            {userInfo && userInfo.user_NICK === userName && (
+              <div
+                onMouseEnter={() => setShowMenu(true)}
+                onMouseLeave={() => setShowMenu(false)}
+                style={{ position: "absolute", right: 5, top: 5 }}
+              >
+                <button onClick={() => setShowMenu((prev) => !prev)}>
+                  <FiMoreHorizontal />
+                </button>
+                {showMenu && <DropdownMenu onEdit={handleEdit} onDelete={handleDelete} />}
+              </div>
+            )}
           </div>
         )}
         <div
