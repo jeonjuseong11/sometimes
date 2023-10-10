@@ -40,7 +40,7 @@ const SubmitButton = styled.button`
 `;
 
 const PostForm = () => {
-  const { fetchPosts, currentPage } = usePostContext();
+  const { fetchPosts, currentPage, setPosts, posts } = usePostContext();
   const [content, setContent] = useState("");
 
   const handleSubmit = async (e) => {
@@ -57,19 +57,24 @@ const PostForm = () => {
       const decryptedUserInfo = decryptData(encryptedUserInfo, encryptionKey);
       const userInfo = JSON.parse(decryptedUserInfo);
 
-      const newEntry = {
-        content: content,
-      };
-
-      const response = await axios.post("http://localhost:8002/board/create", newEntry, {
-        headers: {
-          ACCESS_TOKEN: userInfo.access_TOKEN,
-        },
-      });
-
+      const response = await axios.post(
+        `http://localhost:8002/board/create?content=${content}`,
+        // "https://io065rlls1.execute-api.ap-northeast-2.amazonaws.com/board/create",
+        content,
+        {
+          headers: {
+            ACCESS_TOKEN: userInfo.access_TOKEN,
+          },
+        }
+      );
       if (response.data.success) {
         alert("게시물이 성공적으로 작성되었습니다.");
-        fetchPosts(currentPage);
+        if (response.data.data.state == 1) {
+          setPosts((prevPosts) => [
+            { ...response.data.data, userName: userInfo.user_NICK },
+            ...prevPosts,
+          ]);
+        }
         setContent("");
       } else {
         alert("게시물 작성에 실패하였습니다.");

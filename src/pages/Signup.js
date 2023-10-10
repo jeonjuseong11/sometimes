@@ -73,7 +73,7 @@ const Signup = () => {
     };
 
     try {
-      const response = await axios.post("http://localhost:8080/api/user/join", payload);
+      const response = await axios.post("http://localhost:8002/api/user/join", payload);
 
       if (response.status === 200) {
         alert("회원가입 성공!");

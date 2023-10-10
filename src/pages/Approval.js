@@ -14,23 +14,26 @@ const Approval = () => {
   useEffect(() => {
     const encryptedUserInfo = localStorage.getItem("userInfo");
     const encryptionKey = process.env.REACT_APP_ENCRYPTION_KEY;
-    const decryptedUserInfo = decryptData(encryptedUserInfo, encryptionKey);
-    const userInfo = JSON.parse(decryptedUserInfo);
+    const decryptedUserInfo = JSON.parse(decryptData(encryptedUserInfo, encryptionKey));
 
-    if (!userInfo) {
+    if (!decryptedUserInfo) {
       navigate("/");
     } else {
-      fetchData(userInfo.access_TOKEN);
+      fetchData(decryptedUserInfo.access_TOKEN);
     }
   }, []);
 
   const fetchData = async (accessToken) => {
     try {
-      const response = await axios.get("http://localhost:8002/board/list/0", {
-        headers: {
-          ACCESS_TOKEN: accessToken,
-        },
-      });
+      const response = await axios.get(
+        // "https://io065rlls1.execute-api.ap-northeast-2.amazonaws.com/board/list/0",
+        "http://localhost:8002/board/list/0",
+        {
+          headers: {
+            ACCESS_TOKEN: accessToken,
+          },
+        }
+      );
 
       if (response.status === 200) {
         setPosts(response.data.data);

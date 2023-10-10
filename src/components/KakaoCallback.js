@@ -1,5 +1,5 @@
 import axios from "axios";
-import React, { useEffect } from "react";
+import React, { useCallback, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
 const KakaoCallback = () => {
@@ -19,25 +19,36 @@ const KakaoCallback = () => {
     }
   }, [navigate, location]);
 
-  const handleKakaoLogin = async (code) => {
-    try {
-      const response = await axios.post(`http://localhost:8002/oauth/kakao?code=${code}`);
-
-      const userData = response.data.data;
-      const encryptionKey = process.env.REACT_APP_ENCRYPTION_KEY;
-      const encryptedUserData = encryptData(JSON.stringify(userData), encryptionKey);
-      localStorage.setItem("userInfo", encryptedUserData);
-      navigate("/home");
-    } catch (error) {
-      console.error("Error:", error);
-      alert("카카오 로그인에 실패했습니다. 다시 시도해주세요.");
-    }
-  };
-
-  const encryptData = (data, key) => {
+  const encryptData = useCallback((data, key) => {
     const encryptedData = btoa(unescape(encodeURIComponent(data + key)));
     return encryptedData;
-  };
+  }, []);
+
+  const handleKakaoLogin = useCallback(
+    async (code) => {
+      try {
+        const response = await axios.post(
+          // `https://io065rlls1.execute-api.ap-northeast-2.amazonaws.com/oauth/kakao?code=${code}`
+          `http://localhost:8002/oauth/kakao?code=${code}`
+        );
+
+        const userData = response.data.data;
+        const encryptionKey = process.env.REACT_APP_ENCRYPTION_KEY;
+
+        if (userData && encryptionKey) {
+          const encryptedUserData = encryptData(JSON.stringify(userData), encryptionKey);
+          localStorage.setItem("userInfo", encryptedUserData);
+          navigate("/home");
+        } else {
+          throw new Error("Invalid user data or encryption key");
+        }
+      } catch (error) {
+        console.error("Error:", error);
+        alert("카카오 로그인에 실패했습니다. 다시 시도해주세요.");
+      }
+    },
+    [encryptData, navigate]
+  );
 
   // 디바운스 함수 생성
   const debounce = (func, delay) => {

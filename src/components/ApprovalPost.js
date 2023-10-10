@@ -1,9 +1,9 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { BsCheckLg } from "react-icons/bs";
 import { ImCancelCircle } from "react-icons/im";
 import styled from "styled-components";
-import { decryptData } from "../utils/decryptData"; // decryptData import 추가
+import { decryptData } from "../utils/decryptData";
 
 const Container = styled.div`
   padding: 1rem;
@@ -51,11 +51,28 @@ const RejectButton = styled(ApprovalButton)`
 `;
 
 const ApprovalPost = ({ userName, id, content, fetchData }) => {
-  const userInfo = JSON.parse(decryptData(localStorage.getItem("userInfo"))); // decryptData 적용
-  const [state, setState] = useState();
+  // userInfo 파싱 및 설정
+  const [userInfo, setUserInfo] = useState(null);
+
+  useEffect(() => {
+    try {
+      const decryptedData = decryptData(localStorage.getItem("userInfo"), "mySecretEncryptionKey");
+      const parsedData = JSON.parse(decryptedData);
+      setUserInfo(parsedData);
+    } catch (error) {
+      console.error("Error:", error);
+      // 추가적인 에러 처리가 필요하다면 여기에 작성합니다.
+    }
+  }, []);
   const acceptPost = async (state) => {
+    if (!userInfo || !userInfo.access_TOKEN) {
+      console.error("User info or access token is not available");
+      alert("사용자 정보가 없습니다. 다시 로그인해주세요.");
+      return;
+    }
     try {
       const response = await axios.put(
+        // `https://io065rlls1.execute-api.ap-northeast-2.amazonaws.com/board/changeState/${id}?state=${state}`,
         `http://localhost:8002/board/changeState/${id}?state=${state}`,
         null,
         {
@@ -67,7 +84,7 @@ const ApprovalPost = ({ userName, id, content, fetchData }) => {
 
       if (response.status === 200) {
         alert("게시글 확인 완료");
-        fetchData();
+        fetchData(userInfo.access_TOKEN);
       } else {
         alert("게시글 확인 실패");
       }
