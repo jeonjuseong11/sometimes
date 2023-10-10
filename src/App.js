@@ -13,22 +13,29 @@ import KakaoCallback from "./components/KakaoCallback";
 import { PostProvider } from "./contexts/PostContext";
 
 function App() {
-  const encryptedUserInfo = localStorage.getItem("userInfo");
+  const encryptionKey = process.env.REACT_APP_ENCRYPTION_KEY;
+  const encryptedUserInfo = localStorage.getItem("userInfo"); // 암호화된 유저 정보
   const navigate = useNavigate();
-
   useEffect(() => {
     const handleNavigation = async () => {
       if (!encryptedUserInfo) {
-        navigate("/");
+        if (window.location.pathname !== "/") {
+          navigate("/");
+        }
       } else {
-        const encryptionKey = process.env.REACT_APP_ENCRYPTION_KEY;
         const decryptedUserInfo = decryptData(encryptedUserInfo, encryptionKey);
         const userInfo = JSON.parse(decryptedUserInfo);
         axios.defaults.headers.common["ACCESS_TOKEN"] = userInfo?.access_TOKEN;
-        navigate("/home");
+        if (window.location.pathname !== "/home") {
+          navigate("/home");
+        }
       }
     };
 
+    // 복호화된 유저 정보를 가져옴
+    const decryptedUserInfo = decryptData(encryptedUserInfo, encryptionKey);
+    const userInfo = JSON.parse(decryptedUserInfo);
+    axios.defaults.headers.common["ACCESS_TOKEN"] = userInfo?.access_TOKEN;
     handleNavigation();
   }, [encryptedUserInfo, navigate]);
 
@@ -37,7 +44,6 @@ function App() {
       <PostProvider>
         <Routes>
           <Route exact path="/" element={<Login />} />
-          {/* <Route exact path="/oauth/kakao" element={<Login />} /> */}
           <Route exact path="/home" element={<Home />} />
           <Route exact path="/signup" element={<Signup />} />
           <Route exact path="/oauth/kakao" element={<KakaoCallback />} />

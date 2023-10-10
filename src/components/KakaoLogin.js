@@ -1,19 +1,15 @@
-import React from "react";
+import React, { useState } from "react";
 
 const KakaoLogin = () => {
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
   const KAKAO_AUTH_URL = "https://kauth.kakao.com/oauth/authorize";
   const CLIENT_ID = process.env.REACT_APP_CLIENT_ID;
   const REDIRECT_URI = process.env.REACT_APP_REDIRECT_URI;
 
-  const handleKakaoLoginClick = async () => {
+  const handleKakaoLoginClick = () => {
+    setIsLoggingIn(true);
     const kakaoURL = `${KAKAO_AUTH_URL}?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&response_type=code`;
-
-    try {
-      // 로그인 버튼을 클릭하여 카카오 인증 화면으로 이동
-      window.location.href = kakaoURL;
-    } catch (error) {
-      console.error("Error:", error);
-    }
+    window.location.href = kakaoURL;
   };
 
   return (
@@ -33,6 +29,7 @@ const KakaoLogin = () => {
         height={40}
         src="/assets/icons/kakao_login_large_narrow.png"
         onClick={handleKakaoLoginClick}
+        style={{ cursor: isLoggingIn ? "default" : "pointer", opacity: isLoggingIn ? 0.5 : 1 }}
       />
     </div>
   );
