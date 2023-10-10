@@ -3,13 +3,13 @@ import { usePostContext } from "../contexts/PostContext";
 import Post from "./Post";
 
 const PostList = () => {
-  const { posts, isLoading, hasMore } = usePostContext();
+  const { posts, isLoading, hasMore, setPosts, fetchPosts } = usePostContext();
 
   return (
     <div style={{ height: "100%" }}>
       {posts.map((post, index) => (
         <div key={post.id}>
-          <Post {...post} />
+          <Post {...post} setPosts={setPosts} fetchPosts={fetchPosts} />
         </div>
       ))}
       {isLoading && <div style={{ padding: "1rem", textAlign: "center" }}>Loading...</div>}
